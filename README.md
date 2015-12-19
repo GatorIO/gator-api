@@ -1,2 +1,2 @@
 # gator-api
-API for user and account provisioning, session management and authentication routes.
+API for user and account provisioning, authentication and session management.
