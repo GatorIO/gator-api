@@ -1,11 +1,11 @@
 {
   "name": "gator-api",
   "description": "Gator.IO admin api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Gator.IO"
   },
-  "main": "app.js",
+  "main": "lib/index.js",
   "contributors": [
     {
       "name": "Phil Vizzaccaro",
