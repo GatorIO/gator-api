@@ -27,6 +27,7 @@ declare module 'gator-utils' {
     export function missingParams(req:any, requiredParams:string[]):string[];
     export function guid():string;
     export function hash(input:string):number;
+    export function noCache(res:any):void;
 
     export module config {
         export function env(): string;

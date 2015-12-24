@@ -16,6 +16,9 @@
     "type": "git",
     "url": "https://github.com/GatorIO/gator-admin.git"
   },
+  "engines": {
+    "node": ">=4.2.0"
+  },
   "dependencies": {
     "async": "^1.5.0",
     "lru-cache": "^4.0.0",
