@@ -1,0 +1,14 @@
+.idea/
+.ntvs_analysis.dat
+obj/Debug/edge.njsproj.FileListAbsolute.txt
+latest-build/
+obj/
+bin/
+edge.v12.suo
+*.suo
+.ntvs_analysis.dat.tmp
+
+*.js.map
+
+!**/public/**
+!**/node_modules/**

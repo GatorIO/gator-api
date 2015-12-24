@@ -1,0 +1,26 @@
+{
+  "name": "gator-api",
+  "description": "Gator.IO admin api",
+  "version": "1.0.0",
+  "author": {
+    "name": "Gator.IO"
+  },
+  "main": "app.js",
+  "contributors": [
+    {
+      "name": "Phil Vizzaccaro",
+      "email": "phil@gator.io"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GatorIO/gator-admin.git"
+  },
+  "dependencies": {
+    "async": "^1.5.0",
+    "lru-cache": "^4.0.0",
+    "gator-utils": "GatorIO/gator-utils",
+    "restify": "^4.0.3"
+  },
+  "license" : "MIT"
+}
