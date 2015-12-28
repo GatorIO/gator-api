@@ -121,6 +121,7 @@ declare module 'gator-api' {
     }
 
     export function login(name: string, password: string, moduleId: number, callback: (err?: APIError, result?: Authorization) => void);
+    export function logout(res: any);
     export function authorize(params: any, callback: (err?: APIError, result?: Authorization) => void);
     export function hasPermission(accessToken: string, moduleId: number, permission: string | number, callback: (err?: APIError, result?: boolean) => void);
 
