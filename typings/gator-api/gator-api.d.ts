@@ -84,6 +84,7 @@ declare module 'gator-api' {
             public moduleId: string;
             public status: number;
             public ipAddress: string;
+            public data: Object;
         }
 
         export function get(params: any, callback: (err?: APIError, result?: any) => void);
