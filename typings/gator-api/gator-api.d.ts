@@ -1,4 +1,4 @@
-declare module 'gator-admin' {
+declare module 'gator-api' {
 
     export var client;
 
@@ -112,6 +112,11 @@ declare module 'gator-admin' {
         account: accounts.Account;
         projects: Array<projects.Project>;
         currentProjectId: number;
+    }
+
+    export module sessions {
+        export function set(authObject: any);
+        export function get(accessToken: string);
     }
 
     export function login(name: string, password: string, moduleId: number, callback: (err?: APIError, result?: Authorization) => void);
