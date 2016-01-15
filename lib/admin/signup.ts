@@ -53,15 +53,9 @@ module.exports = function(params: any, callback: Function) {
                         }
 
                         //  re-auth the user with the module id to get the new role info
-                        var authParams = {
-                            moduleId: settings.moduleId,
-                            accessToken: authorization.accessToken,
-                            noCache: true
-                        };
-
-                        api.authorize(authParams, function(err: APIError, authObject: api.Authorization) {
-                            sessions.set(authObject);
-                            callback(null, authObject);
+                        login(user.name, user.password, settings.moduleId, function(err, authorization) {
+                            sessions.set(authorization);
+                            callback(err, authorization);
                         });
                     });
                 }
