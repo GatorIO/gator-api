@@ -139,7 +139,8 @@ export function authenticate(req, res, next) {
         if (!req.session) {
 
             var authParams = {
-                accessToken: req.signedCookies['accessToken']
+                accessToken: req.signedCookies['accessToken'],
+                noCache: true
             };
 
             if (settings.hasOwnProperty('moduleId'))
