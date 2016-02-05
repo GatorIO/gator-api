@@ -128,18 +128,24 @@ export function authenticate(req, res, next) {
     // if user is authenticated in the session, call the next() to call the next request handler
     // The session adds this method to request object. A middleware is allowed to add properties to
     // request and response objects
-    var noRedirect = req['noRedirect'];
+    var accessToken, noRedirect = req['noRedirect'];
     delete req['noRedirect'];
 
-    if (req.signedCookies['accessToken']) {
+    //  look for an access token override on the query string
+    if (req.query && req.query.accessToken)
+        accessToken = req.query.accessToken;
+    else if (req.signedCookies['accessToken'])
+        accessToken = req.signedCookies['accessToken'];
 
-        req.session = sessions.get(req.signedCookies['accessToken']);
+    if (accessToken) {
+
+        req.session = sessions.get(accessToken);
 
         //  if the session doesn't exist, try to authorize the token, since the server may have been rebooted
         if (!req.session) {
 
             var authParams = {
-                accessToken: req.signedCookies['accessToken'],
+                accessToken: accessToken,
                 noCache: true
             };
 
