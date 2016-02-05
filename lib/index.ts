@@ -132,9 +132,10 @@ export function authenticate(req, res, next) {
     delete req['noRedirect'];
 
     //  look for an access token override on the query string
-    if (req.query && req.query.accessToken)
+    if (req.query && req.query.accessToken) {
         accessToken = req.query.accessToken;
-    else if (req.signedCookies['accessToken'])
+        setSessionCookie(res, accessToken);
+    } else if (req.signedCookies['accessToken'])
         accessToken = req.signedCookies['accessToken'];
 
     if (accessToken) {
