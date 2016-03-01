@@ -239,15 +239,3 @@ export function machineId(): string {
         return require("os").hostname();
     }
 }
-
-//  Enforce that the request is secure.  If it is not, redirect to a secure version of the url.
-export function enforceSecure(req, res, next: Function) {
-
-    if (_REST.isSecure(req))
-        return next();
-    else {
-
-        res.header('Location', 'https://' + application.domain + req.url);
-        res.status(302).send('Enforcing secure connection policy');      //  permanent redir
-    }
-}
