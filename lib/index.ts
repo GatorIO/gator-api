@@ -12,6 +12,8 @@ import _accounts = require('./admin/accounts');
 import _roles = require('./admin/roles');
 import _projects = require('./admin/projects');
 
+import _REST = require('./REST');
+
 var settings = utils.config.settings();
 
 export var client: restify.Client = _client;
@@ -24,6 +26,8 @@ export var logs = require('./admin/logs');
 export var login = require('./admin/login');
 export var signup = require('./admin/signup');
 export var sessions = require('./admin/sessions');
+
+export var REST = require('./REST');
 
 export class Authorization {
     accessToken: string;
@@ -233,5 +237,17 @@ export function machineId(): string {
 
         //  on an error, fallback to hostname
         return require("os").hostname();
+    }
+}
+
+//  Enforce that the request is secure.  If it is not, redirect to a secure version of the url.
+export function enforceSecure(req, res, next: Function) {
+
+    if (_REST.isSecure(req))
+        return next();
+    else {
+
+        res.header('Location', 'https://' + application.domain + req.url);
+        res.status(302).send('Enforcing secure connection policy');      //  permanent redir
     }
 }

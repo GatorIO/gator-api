@@ -1,4 +1,7 @@
+/// <reference path="../restify/restify.d.ts" />
+
 declare module 'gator-api' {
+    import restify = require('restify');
 
     export var client;
 
@@ -118,6 +121,45 @@ declare module 'gator-api' {
     export module sessions {
         export function set(authObject: any);
         export function get(accessToken: string);
+    }
+
+    export module REST {
+        export var client: restify.Client;
+        export class ResponseResult {
+
+            constructor(code?: number, data?: Object, message?: string);
+
+            //  The HTTP status code.  This will be 200 for successful requests.
+            code: number;
+
+            //  A message associated with the response.  This will generally contain error messages.
+            message: string;
+
+            //  The payload.
+            data: Object;
+
+            public toJson(): Object;
+        }
+
+        export function sendError(res: any, err: any)
+        export function noCache(res: any);
+        export function redirect(res: any, location: string, code: number);
+        export function send(res: any, data?: Object, message?: string);
+        export function sendConditional(res: any, err: any, data?: Object, message?: string);
+        export function isSecure(req): boolean;
+    }
+
+    export interface ISettings {
+        domain: string;
+        appName: string;
+        moduleId: number;
+
+        nodeHost: string;
+        nodePort: number;
+        nodeUrl: string;
+
+        apiUrl: string;
+        apiVersion: string;
     }
 
     export function login(name: string, password: string, moduleId: number, callback: (err?: APIError, result?: Authorization) => void);
