@@ -5,10 +5,55 @@ declare module 'gator-api' {
 
     export var client;
 
-    export class APIError {
-        message: string;
-        code: number;
-        constructor (message?: string);
+    export module errors {
+
+        export class APIError {
+            message: string;
+            code: number;
+            constructor (message?: string);
+        }
+
+        export class InternalError implements APIError {
+            message: string;
+            code: number;
+            constructor (message?: string);
+        }
+
+        export class DuplicateError implements APIError {
+            message: string;
+            code: number;
+            constructor (message?: string);
+        }
+
+        export class NotFoundError implements APIError {
+            message: string;
+            code: number;
+            constructor (message?: string);
+        }
+
+        export class MissingParameterError implements APIError {
+            message: string;
+            code: number;
+            constructor (message?: string);
+        }
+
+        export class UnauthorizedError implements APIError {
+            message: string;
+            code: number;
+            constructor (message?: string);
+        }
+
+        export class BadRequestError implements APIError {
+            message: string;
+            code: number;
+            constructor (message?: string);
+        }
+
+        export class AuthenticationTimeoutError implements APIError {
+            message: string;
+            code: number;
+            constructor (message?: string);
+        }
     }
 
     export module modules {
@@ -28,7 +73,7 @@ declare module 'gator-api' {
             public permissions: Array<Permission>;     //  the available permissions for the module
         }
 
-        export function getAll(callback: (err?: APIError, result?: Array<Module>) => void);
+        export function getAll(callback: (err?: errors.APIError, result?: Array<Module>) => void);
     }
 
     export module roles {
@@ -68,8 +113,8 @@ declare module 'gator-api' {
             public roles: Array<roles.Role>;
         }
 
-        export function create(params: any, callback: (err?: APIError, result?: any) => void);
-        export function authorize(accessToken: string, callback: (err?: APIError, result?: any) => void);
+        export function create(params: any, callback: (err?: errors.APIError, result?: any) => void);
+        export function authorize(accessToken: string, callback: (err?: errors.APIError, result?: any) => void);
     }
 
     export module accounts {
@@ -90,8 +135,8 @@ declare module 'gator-api' {
             public data: any;
         }
 
-        export function get(params: any, callback: (err?: APIError, result?: any) => void);
-        export function create(params: any, callback: (err?: APIError, result?: any) => void);
+        export function get(params: any, callback: (err?: errors.APIError, result?: any) => void);
+        export function create(params: any, callback: (err?: errors.APIError, result?: any) => void);
     }
 
     export module projects {
@@ -105,8 +150,8 @@ declare module 'gator-api' {
             public enabled: boolean;
         }
 
-        export function get(params: any, callback: (err?: APIError, projects?: Array<Project>) => void);
-        export function create(params: any, callback: (err?: APIError, project?: Project) => void);
+        export function get(params: any, callback: (err?: errors.APIError, projects?: Array<Project>) => void);
+        export function create(params: any, callback: (err?: errors.APIError, project?: Project) => void);
     }
 
     export class Authorization {
@@ -162,13 +207,13 @@ declare module 'gator-api' {
         apiVersion: string;
     }
 
-    export function login(name: string, password: string, moduleId: number, callback: (err?: APIError, result?: Authorization) => void);
+    export function login(name: string, password: string, moduleId: number, callback: (err?: errors.APIError, result?: Authorization) => void);
     export function logout(res: any);
-    export function authorize(params: any, callback: (err?: APIError, result?: Authorization) => void);
-    export function hasPermission(accessToken: string, moduleId: number, permission: string | number, callback: (err?: APIError, result?: boolean) => void);
+    export function authorize(params: any, callback: (err?: errors.APIError, result?: Authorization) => void);
+    export function hasPermission(accessToken: string, moduleId: number, permission: string | number, callback: (err?: errors.APIError, result?: boolean) => void);
 
-    export function forgotPassword(email: string, host:string, callback:(err?:APIError, result?:boolean)=>void);
-    export function resetPassword(accessToken: string, password:string, callback:(err?:APIError, result?:boolean)=>void);
+    export function forgotPassword(email: string, host:string, callback:(err?:errors.APIError, result?:boolean)=>void);
+    export function resetPassword(accessToken: string, password:string, callback:(err?:errors.APIError, result?:boolean)=>void);
 
     export function log(a1?: any, a2?: any, a3?: any, a4?: any, a5?: any);
 
@@ -179,7 +224,7 @@ declare module 'gator-api' {
     export function authenticate(req, res, next);
     export function authenticateNoRedirect(req, res, next);
 
-    export function signup(params: any, callback: (err?: APIError, result?: Authorization) => void);
+    export function signup(params: any, callback: (err?: errors.APIError, result?: Authorization) => void);
     export function setSessionCookie(res: any, accessToken: string);
     export function machineId() : string;
 }

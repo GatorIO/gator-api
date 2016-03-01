@@ -5,7 +5,7 @@ import utils = require("gator-utils");
 
 import restify = require('restify');
 import _client = require('./client');
-import APIError = require('./APIError');
+import _errors = require('./errors');
 import _modules = require('./admin/modules');
 import _users = require('./admin/users');
 import _accounts = require('./admin/accounts');
@@ -17,6 +17,7 @@ import _REST = require('./REST');
 var settings = utils.config.settings();
 
 export var client: restify.Client = _client;
+export var errors = _errors;
 export var roles = _roles;
 export var users = _users;
 export var accounts = _accounts;
@@ -45,7 +46,7 @@ export function log(a1, a2, a3, a4, a5) {
 /*
  Authorize an access token and return user data.
  */
-export function authorize(params: any, callback: (err?: APIError, result?: Authorization) => void) {
+export function authorize(params: any, callback: (err?: _errors.APIError, result?: Authorization) => void) {
 
     try {
 
@@ -54,7 +55,7 @@ export function authorize(params: any, callback: (err?: APIError, result?: Autho
             if (err)                                //  first, check for an exception
                 callback(err);
             else if (!result)                       //  then check for a missing result
-                callback(new APIError());
+                callback(new errors.APIError());
             else
                 callback(null, result.data);        //  finally, return the payload
         });
@@ -63,15 +64,15 @@ export function authorize(params: any, callback: (err?: APIError, result?: Autho
     }
 }
 
-export function hasPermission(accessToken: string, moduleId: number, permission: string | number, callback: (err?: APIError, result?: boolean) => void) {
+export function hasPermission(accessToken: string, moduleId: number, permission: string | number, callback: (err?: _errors.APIError, result?: boolean) => void) {
 
-    modules.getAll(function(err: APIError, mods: Array<_modules.Module>) {
+    modules.getAll(function(err: _errors.APIError, mods: Array<_modules.Module>) {
 
         if (err)
             callback(err);
         else {
 
-            authorize(accessToken, function(err?: APIError, authorization?: Authorization) {
+            authorize(accessToken, function(err?: _errors.APIError, authorization?: Authorization) {
 
                 if (err)
                     callback(err);
@@ -109,7 +110,7 @@ export function hasPermission(accessToken: string, moduleId: number, permission:
     });
 }
 
-export function resetPassword(accessToken: string, password:string, callback: (err?: APIError, result?: any) => void) {
+export function resetPassword(accessToken: string, password:string, callback: (err?: _errors.APIError, result?: any) => void) {
     try{
 
         var params = { "password": password };
@@ -119,7 +120,7 @@ export function resetPassword(accessToken: string, password:string, callback: (e
             if (err)                                //  first, check for an exception
                 callback(err);
             else if (!result)                       //  then check for a missing result
-                callback(new APIError());
+                callback(new errors.APIError());
             else
                 callback(null, result);        //  finally, return the payload
         });

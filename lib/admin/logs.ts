@@ -3,7 +3,7 @@
 import utils = require("gator-utils");
 import client = require("../client");
 import restify = require('restify');
-import APIError = require('../APIError');
+import errors = require('../errors');
 
 export function log(a1, a2?, a3?, a4?, a5?) {
 

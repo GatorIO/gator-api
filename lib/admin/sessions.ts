@@ -2,7 +2,7 @@
 /// <reference path="../../typings/restify/restify.d.ts" />
 /// <reference path="../../typings/lru-cache/lru-cache.d.ts" />
 import client = require('../client');
-import APIError = require('../APIError');
+import errors = require('../errors');
 import restify = require('restify');
 
 //  Set up least recently used session cache

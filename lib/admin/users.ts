@@ -1,7 +1,7 @@
 /// <reference path="../../typings/node/node.d.ts" />
 /// <reference path="../../typings/restify/restify.d.ts" />
 import client = require('../client');
-import APIError = require('../APIError');
+import errors = require('../errors');
 import roles = require("./roles");
 import restify = require('restify');
 
@@ -29,7 +29,7 @@ export class User {
     public roles: Array<roles.Role>;
 }
 
-export function create(params: any, callback: (err?: APIError, result?: any) => void) {
+export function create(params: any, callback: (err?: errors.APIError, result?: any) => void) {
     try{
 
         client.post('/v1/users', params, function(err, req: restify.Request, res: restify.Response, result: any) {
@@ -37,7 +37,7 @@ export function create(params: any, callback: (err?: APIError, result?: any) => 
             if (err)                                //  first, check for an exception
                 callback(err);
             else if (!result)                       //  then check for a missing result
-                callback(new APIError());
+                callback(new errors.APIError());
             else
                 callback(null, result.data.user);        //  finally, return the payload
         });
@@ -46,7 +46,7 @@ export function create(params: any, callback: (err?: APIError, result?: any) => 
     }
 }
 
-export function authorize(accessToken: string, callback: (err?: APIError, result?: any) => void) {
+export function authorize(accessToken: string, callback: (err?: errors.APIError, result?: any) => void) {
     try{
 
         var params = { "accessToken": accessToken };
@@ -56,7 +56,7 @@ export function authorize(accessToken: string, callback: (err?: APIError, result
             if (err)                                //  first, check for an exception
                 callback(err);
             else if (!result)                       //  then check for a missing result
-                callback(new APIError());
+                callback(new errors.APIError());
             else
                 callback(null, result.data);        //  finally, return the payload
         });

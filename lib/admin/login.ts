@@ -6,7 +6,7 @@ import client = require('../client');
 import sessions = require('./sessions');
 import accounts = require('./accounts');
 import projects = require('./projects');
-import APIError = require('../APIError');
+import errors = require('../errors');
 
 module.exports = function(name: string, password: string, moduleId: number, callback: Function) {
 
@@ -28,7 +28,7 @@ module.exports = function(name: string, password: string, moduleId: number, call
             if (err)                                //  first, check for an exception
                 callback(err);
             else if (!result)                       //  then check for a missing result
-                callback(new APIError());
+                callback(new errors.APIError());
             else {
                 var authObject = result.data;
 

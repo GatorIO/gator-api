@@ -1,6 +1,6 @@
 /// <reference path="../../typings/restify/restify.d.ts" />
 import client = require('../client');
-import APIError = require('../APIError');
+import errors = require('../errors');
 import restify = require('restify');
 
 export enum AccountStatus {
@@ -24,7 +24,7 @@ export class Account {
     public ipAddress: string;
 }
 
-export function get(params: any, callback: (err?: APIError, account?: Account) => void) {
+export function get(params: any, callback: (err?: errors.APIError, account?: Account) => void) {
 
     try {
 
@@ -33,7 +33,7 @@ export function get(params: any, callback: (err?: APIError, account?: Account) =
             if (err)                                //  first, check for an exception
                 callback(err);
             else if (!result)                       //  then check for a missing result
-                callback(new APIError());
+                callback(new errors.APIError());
             else
                 callback(null, result.data.account);        //  finally, return the payload
         });
@@ -42,7 +42,7 @@ export function get(params: any, callback: (err?: APIError, account?: Account) =
     }
 }
 
-export function create(params: any, callback: (err?: APIError, result?: any) => void) {
+export function create(params: any, callback: (err?: errors.APIError, result?: any) => void) {
 
     try {
 
@@ -51,7 +51,7 @@ export function create(params: any, callback: (err?: APIError, result?: any) => 
             if (err)                                //  first, check for an exception
                 callback(err);
             else if (!result)                       //  then check for a missing result
-                callback(new APIError());
+                callback(new errors.APIError());
             else
                 callback(null, result.data.account);        //  finally, return the payload
         });

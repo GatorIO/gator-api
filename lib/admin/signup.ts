@@ -2,7 +2,7 @@
 import utils = require('gator-utils');
 import users = require('./users');
 import accounts = require('./accounts');
-import APIError = require('../APIError');
+import errors = require('../errors');
 import api = require('../index');
 import sessions = require('./sessions');
 
@@ -45,7 +45,7 @@ module.exports = function(params: any, callback: Function) {
                     };
 
                     //  for a newly registered user, create an account
-                    accounts.create(accountParams, function(err: APIError, account: accounts.Account) {
+                    accounts.create(accountParams, function(err: errors.APIError, account: accounts.Account) {
 
                         if (err) {
                             callback(err);

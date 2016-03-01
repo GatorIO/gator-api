@@ -1,5 +1,5 @@
 ﻿/// <reference path="../../typings/gator-utils/gator-utils.d.ts" />
-import APIError = require('../APIError');
+import errors = require('../errors');
 import utils = require("gator-utils");
 import modules = require("./modules");
 
