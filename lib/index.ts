@@ -240,3 +240,74 @@ export function machineId(): string {
         return require("os").hostname();
     }
 }
+
+//  Get dashboards for current project - dashboards are project/user scope
+export function currentDashboards(req) {
+    var project = currentProject(req);
+    var userId = req['session'].user.id;
+
+    project.data = project.data || {};
+    project.data[userId] = project.data[userId] || {};
+    project.data[userId].dashboards = project.data[userId].dashboards || {};
+
+    return project.data[userId].dashboards;
+}
+
+//  Get bookmarks for current project - bookmarks are project/user scope
+export function currentBookmarks(req) {
+    var project = currentProject(req);
+    var userId = req['session'].user.id;
+
+    project.data = project.data || {};
+    project.data[userId] = project.data[userId] || {};
+    project.data[userId].bookmarks = project.data[userId].bookmarks || {};
+
+    return project.data[userId].bookmarks;
+}
+
+//  Get attributes for a project - custom attributes are project scope
+export function getCustomAttributes(req, projectId) {
+    var project = getProject(req, projectId);
+
+    project.data = project.data || {};
+    project.data.attributes = project.data.attributes || {};
+    return project.data.attributes;
+}
+
+//  Return a project object based on an id
+export function getProject(req, id) {
+
+    if (!req || !req['session'])
+        return null;
+
+    var ret, projects = req['session'].projects;
+
+    if (projects && id) {
+
+        projects.forEach(function(item) {
+            if (item.id == +id)
+                ret = item;
+        });
+    }
+
+    return ret || null;
+}
+
+//  Return the current active project's object or NULL if one is not selected
+export function currentProject(req) {
+
+    if (!req || !req['session'])
+        return null;
+
+    var ret, projects = req['session'].projects, id = req['session'].currentProjectId;
+
+    if (projects && id) {
+
+        projects.forEach(function(item) {
+            if (item.id == +id)
+                ret = item;
+        });
+    }
+
+    return ret || null;
+}

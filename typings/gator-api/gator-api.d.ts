@@ -142,8 +142,6 @@ declare module 'gator-api' {
     export module projects {
 
         export class Project {
-
-            //  module attributes
             public id: number;
             public accountId: number;
             public name: string;
@@ -171,18 +169,10 @@ declare module 'gator-api' {
     export module REST {
         export var client: restify.Client;
         export class ResponseResult {
-
             constructor(code?: number, data?: Object, message?: string);
-
-            //  The HTTP status code.  This will be 200 for successful requests.
             code: number;
-
-            //  A message associated with the response.  This will generally contain error messages.
             message: string;
-
-            //  The payload.
             data: Object;
-
             public toJson(): Object;
         }
 
@@ -227,4 +217,9 @@ declare module 'gator-api' {
     export function signup(params: any, callback: (err?: errors.APIError, result?: Authorization) => void);
     export function setSessionCookie(res: any, accessToken: string);
     export function machineId() : string;
+    export function currentDashboards(req);
+    export function currentBookmarks(req);
+    export function getCustomAttributes(req, projectId);
+    export function getProject(req, id);
+    export function currentProject(req);
 }
