@@ -11,6 +11,7 @@ import _users = require('./admin/users');
 import _accounts = require('./admin/accounts');
 import _roles = require('./admin/roles');
 import _projects = require('./admin/projects');
+import _reporting = require('./reporting');
 
 import _REST = require('./REST');
 
@@ -23,10 +24,13 @@ export var users = _users;
 export var accounts = _accounts;
 export var modules = _modules;
 export var projects = _projects;
+export var reporting = _reporting;
+
 export var logs = require('./admin/logs');
 export var login = require('./admin/login');
 export var signup = require('./admin/signup');
 export var sessions = require('./admin/sessions');
+
 
 export var REST = require('./REST');
 
