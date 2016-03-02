@@ -319,3 +319,26 @@ export function getSegmentOptions(req) {
     return options;
 }
 
+export function getSegments(req, useCache: boolean, callback: (err: api.errors.APIError, segments?: Array<Segment>) => void) {
+
+    try {
+
+        //  if the segments for the account have already been looked up, just return them
+        if (useCache && req.session['segments']) {
+            callback(null, req.session['segments']);
+            return;
+        }
+
+        REST.client.get('/v1/analytics/segments/account/' + req['session'].account.id + '?accessToken=' + req.session['accessToken'], function(err: errors.APIError, apiRequest, apiResponse, result: any) {
+
+            if (!err)
+                req.session['segments'] = result.data;
+            else
+                req.session['segments'] = [];
+
+            callback(err, result.data);
+        });
+    } catch(err) {
+        callback(err);
+    }
+}
