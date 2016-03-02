@@ -319,7 +319,7 @@ export function getSegmentOptions(req) {
     return options;
 }
 
-export function getSegments(req, useCache: boolean, callback: (err: api.errors.APIError, segments?: Array<Segment>) => void) {
+export function getSegments(req, useCache: boolean, callback: (err: errors.APIError, segments?: Array<Segment>) => void) {
 
     try {
 
