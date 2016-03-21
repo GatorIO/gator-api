@@ -165,6 +165,9 @@ export function getAttributeOptions(view: string, attributeType: AttributeTypes,
         if (view == 'events') {
             addAttributeView(options, 'event', attributeType, customAttribs);
         }
+
+        addAttributeView(options, 'person', attributeType, customAttribs);
+
     }
 
     //  add standard attributes
