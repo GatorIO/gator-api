@@ -332,7 +332,7 @@ export function getSegments(req, useCache: boolean, callback: (err: errors.APIEr
             return;
         }
 
-        REST.client.get('/v1/analytics/segments/account/' + req['session'].account.id + '?accessToken=' + req.session['accessToken'], function(err: errors.APIError, apiRequest, apiResponse, result: any) {
+        REST.client.get('/v1/analytics/segments?accessToken=' + req.session['accessToken'], function(err: errors.APIError, apiRequest, apiResponse, result: any) {
 
             if (!err)
                 req.session['segments'] = result.data;
