@@ -234,7 +234,7 @@ export function hasAdminPermission(req, permission: string): boolean {
         
         var user = req.session.user;
 
-        if (req.user.appId != 1)
+        if (user.appId != 1)
             return false;
         
         for (var p = 0; p < user.permissions.length; p++) {

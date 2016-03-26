@@ -24,24 +24,24 @@ export class Application {
     public permissions: Array<Permission>;     //  the available permissions for the module
 }
 
-var cachedModules: Array<Application>;
+var cachedApps: Array<Application>;
 
 export function getAll(callback: (err?: errors.APIError, result?: Array<Application>) => void) {
 
     try {
 
-        if (cachedModules)
-            callback(null, cachedModules);
+        if (cachedApps)
+            callback(null, cachedApps);
         else {
 
-            client.get('/v1/modules', function(err, req: restify.Request, res: restify.Response, result: any) {
+            client.get('/v1/applications', function(err, req: restify.Request, res: restify.Response, result: any) {
 
                 if (err)                                //  first, check for an exception
                     callback(err);
                 else if (!result)                       //  then check for a missing result
                     callback(new errors.APIError());
                 else {
-                    cachedModules = result.data;
+                    cachedApps = result.data;
                     callback(null, result.data);        //  finally, return the payload
                 }
             });
