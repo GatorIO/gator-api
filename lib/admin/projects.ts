@@ -28,7 +28,7 @@ export class Project {
 export function get(params: any, callback: (err?: errors.APIError, projects?: Array<Project>) => void) {
     try{
 
-        client.get('/v1/projects/account/' + params.accountId + '?accessToken=' + params.accessToken, function(err, req: restify.Request, res: restify.Response, result: any) {
+        client.get('/v1/projects?accessToken=' + params.accessToken, function(err, req: restify.Request, res: restify.Response, result: any) {
 
             if (err)                                //  first, check for an exception
                 callback(err);
