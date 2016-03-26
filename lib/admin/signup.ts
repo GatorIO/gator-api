@@ -39,7 +39,7 @@ module.exports = function(params: any, callback: Function) {
                     //  for a newly registered user, create an account
                     var accountParams = {
                         accessToken: authorization.accessToken,
-                        moduleId: settings.moduleId,
+                        appId: settings.appId,
                         name: user.name,
                         status: 0
                     };
@@ -53,7 +53,7 @@ module.exports = function(params: any, callback: Function) {
                         }
 
                         //  re-auth the user with the module id to get the new role info
-                        login(user.name, user.password, settings.moduleId, function(err, authorization) {
+                        login(user.name, user.password, settings.appId, function(err, authorization) {
                             sessions.set(authorization);
                             callback(err, authorization);
                         });

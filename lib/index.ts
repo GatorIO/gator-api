@@ -6,10 +6,9 @@ import utils = require("gator-utils");
 import restify = require('restify');
 import _client = require('./client');
 import _errors = require('./errors');
-import _modules = require('./admin/modules');
+import _applications = require('./admin/applications');
 import _users = require('./admin/users');
 import _accounts = require('./admin/accounts');
-import _roles = require('./admin/roles');
 import _projects = require('./admin/projects');
 import _reporting = require('./reporting');
 
@@ -19,10 +18,9 @@ var settings = utils.config.settings();
 
 export var client: restify.Client = _client;
 export var errors = _errors;
-export var roles = _roles;
 export var users = _users;
 export var accounts = _accounts;
-export var modules = _modules;
+export var applications = _applications;
 export var projects = _projects;
 export var reporting = _reporting;
 
@@ -68,71 +66,6 @@ export function authorize(params: any, callback: (err?: _errors.APIError, result
     }
 }
 
-export function hasPermission(accessToken: string, moduleId: number, permission: string | number, callback: (err?: _errors.APIError, result?: boolean) => void) {
-
-    modules.getAll(function(err: _errors.APIError, mods: Array<_modules.Module>) {
-
-        if (err)
-            callback(err);
-        else {
-
-            authorize(accessToken, function(err?: _errors.APIError, authorization?: Authorization) {
-
-                if (err)
-                    callback(err);
-                else if (!authorization || !authorization.user || !authorization.user.roles)
-                    callback(null, false);
-                else {
-
-                    for (var r = 0; r < authorization.user.roles.length; r++) {
-
-                        for (var p = 0; p < authorization.user.roles[r].permissions.length; p++) {
-
-                            if (authorization.user.roles[r].moduleId == moduleId) {
-
-                                if (typeof permission == 'string') {
-
-                                    if (authorization.user.roles[r].permissions[p].name == permission) {
-                                        callback(null, true);
-                                        return;
-                                    }
-                                } else {
-
-                                    if (authorization.user.roles[r].permissions[p].id == permission) {
-                                        callback(null, true);
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    callback(null, false);
-                }
-            });
-        }
-    });
-}
-
-export function resetPassword(accessToken: string, password:string, callback: (err?: _errors.APIError, result?: any) => void) {
-    try{
-
-        var params = { "password": password };
-
-        client.post('/v1/users/resetpassword/' + accessToken, params, function(err, req: restify.Request, res: restify.Response, result: any) {
-
-            if (err)                                //  first, check for an exception
-                callback(err);
-            else if (!result)                       //  then check for a missing result
-                callback(new errors.APIError());
-            else
-                callback(null, result);        //  finally, return the payload
-        });
-    } catch(err) {
-        callback(err);
-    }
-}
-
 export function authenticate(req, res, next) {
     // if user is authenticated in the session, call the next() to call the next request handler
     // The session adds this method to request object. A middleware is allowed to add properties to
@@ -159,8 +92,8 @@ export function authenticate(req, res, next) {
                 noCache: true
             };
 
-            if (settings.hasOwnProperty('moduleId'))
-                authParams['moduleId'] = +settings.moduleId;
+            if (settings.hasOwnProperty('appId'))
+                authParams['appId'] = +settings.appId;
 
             authorize(authParams, function(err, authObject) {
 
@@ -281,4 +214,38 @@ export function currentProject(req) {
     }
 
     return ret || null;
+}
+
+//  Check that an auth has a specific permission for an app - this applies mainly to ops and admin functions
+export function isSysAdmin(req): boolean {
+    return hasAdminPermission(req, 'admin');
+}
+
+//  Check that an auth has a specific permission for an app - this applies mainly to ops and admin functions
+export function hasAdminPermission(req, permission: string): boolean {
+
+    try {
+
+        //  A permission is granted if:
+        //  1)  The user has been assigned admin permission
+        //  2)  The user has been assigned the specific permission
+        if (!req || !req.session || !req.session.user || !req.session.user.permissions)
+            return false;
+        
+        var user = req.session.user;
+
+        if (req.user.appId != 1)
+            return false;
+        
+        for (var p = 0; p < user.permissions.length; p++) {
+
+            //  Check for a specific permission - for admin checks DO NOT check for owner status
+            if (user.permissions[p] == 'admin' || user.permissions[p] == permission)
+                return true;
+        }
+
+        return false;
+    } catch (err) {
+         return false;
+    }
 }

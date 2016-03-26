@@ -16,7 +16,7 @@ export class Permission {
     }
 }
 
-export class Module {
+export class Application {
 
     //  module attributes
     public id: number;
@@ -24,9 +24,9 @@ export class Module {
     public permissions: Array<Permission>;     //  the available permissions for the module
 }
 
-var cachedModules: Array<Module>;
+var cachedModules: Array<Application>;
 
-export function getAll(callback: (err?: errors.APIError, result?: Array<Module>) => void) {
+export function getAll(callback: (err?: errors.APIError, result?: Array<Application>) => void) {
 
     try {
 

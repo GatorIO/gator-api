@@ -3,7 +3,7 @@
  */
 interface ISettings {
     appName: string;
-    moduleId: number;
+    appId: number;
 
     nodeHost: string;
     nodePort: number;

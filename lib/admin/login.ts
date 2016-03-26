@@ -8,7 +8,7 @@ import accounts = require('./accounts');
 import projects = require('./projects');
 import errors = require('../errors');
 
-module.exports = function(name: string, password: string, moduleId: number, callback: Function) {
+module.exports = function(name: string, password: string, appId: number, callback: Function) {
 
     try {
 
@@ -17,10 +17,10 @@ module.exports = function(name: string, password: string, moduleId: number, call
             password: password
         };
 
-        //  If the module is specified, it means the login is for a specific module(product).  Specifying the moduleId will
+        //  If the module is specified, it means the login is for a specific module(product).  Specifying the appId will
         //  check for the existance of an account for the user in that module and pull the user's account object into the authObject.
-        if (utils.isNumeric(moduleId)) {
-            params['moduleId'] = moduleId;
+        if (utils.isNumeric(appId)) {
+            params['appId'] = appId;
         }
 
         client.post('/v1/login', params, function (err, req: any, res: any, result: any) {

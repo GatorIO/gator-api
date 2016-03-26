@@ -2,7 +2,6 @@
 /// <reference path="../../typings/restify/restify.d.ts" />
 import client = require('../client');
 import errors = require('../errors');
-import roles = require("./roles");
 import restify = require('restify');
 
 export enum UserStatus {
@@ -26,7 +25,6 @@ export class User {
     public createdDate: Date;
     public lastUpdated: Date;
     public ipAddress: string;
-    public roles: Array<roles.Role>;
 }
 
 export function create(params: any, callback: (err?: errors.APIError, result?: any) => void) {

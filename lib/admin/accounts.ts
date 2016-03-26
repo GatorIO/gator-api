@@ -19,7 +19,7 @@ export class Account {
     public name: string;
     public createdDate: Date;
     public userId: string;
-    public moduleId: string;
+    public appId: string;
     public status: number;
     public ipAddress: string;
 }
