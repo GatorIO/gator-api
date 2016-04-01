@@ -67,19 +67,22 @@ declare module 'gator-api' {
     export module applications {
 
         export class Permission {
-            public id:number;
-            public name:string;
+            public id:string;
             public description:string;
 
-            constructor(id:number, name:string, description?:string);
+            constructor(id:string, description?:string);
         }
 
         export class Application {
 
             //  app attributes
-            public id:number;
-            public name:string;
-            public permissions:Array<Permission>;     //  the available permissions for the app
+            public id: number;
+            public name: string;
+            public description: string;
+            public host: string;
+            public devHost: string;
+            public commissions: boolean;
+            public permissions: Array<Permission>;     //  the available permissions for the module
         }
 
         export function getAll(callback:(err?:errors.APIError, result?:Array<Application>) => void);

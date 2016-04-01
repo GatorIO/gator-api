@@ -5,13 +5,11 @@ import errors = require('../errors');
 import restify = require('restify');
 
 export class Permission {
-    public id: number;
-    public name: string;
+    public id: string;
     public description: string;
 
-    constructor(id: number, name: string, description?: string) {
+    constructor(id: string, description?: string) {
         this.id = id;
-        this.name = name;
         this.description = description;
     }
 }
@@ -21,6 +19,10 @@ export class Application {
     //  module attributes
     public id: number;
     public name: string;
+    public description: string;
+    public host: string;
+    public devHost: string;
+    public commissions: boolean;
     public permissions: Array<Permission>;     //  the available permissions for the module
 }
 
@@ -41,8 +43,8 @@ export function getAll(callback: (err?: errors.APIError, result?: Array<Applicat
                 else if (!result)                       //  then check for a missing result
                     callback(new errors.APIError());
                 else {
-                    cachedApps = result.data;
-                    callback(null, result.data);        //  finally, return the payload
+                    cachedApps = result.data.applications;
+                    callback(null, result.data.applications);        //  finally, return the payload
                 }
             });
         }

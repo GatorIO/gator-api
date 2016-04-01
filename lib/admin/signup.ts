@@ -13,14 +13,16 @@ module.exports = function(params: any, callback: Function) {
 
     try {
 
-        var user = {
+        var user: any = {
             appId: settings.appId,
             name: params['username'],
             password: params['password'],
             firstName: params['firstName'],
             lastName: params['lastName'],
+            email: params['email'],
             status: 0,
-            timezone: params['timezoneId']
+            timezone: params['timezoneId'],
+            accountData: params['accountData']
         };
 
         users.create(user, function(err, newuser){
