@@ -25,6 +25,9 @@ module.exports = function(params: any, callback: Function) {
             accountData: params['accountData']
         };
 
+        if (params['partnerId'])
+            user.partnerId = params['partnerId'];
+        
         users.create(user, function(err, newuser){
 
             if (err) {
@@ -32,7 +35,7 @@ module.exports = function(params: any, callback: Function) {
                 return;
             }
 
-            //  first log in with no module just to get access token
+            //  log in to get access token
             login(user.name, user.password, settings.appId, function(err, authorization) {
                 callback(err, authorization);
             });
