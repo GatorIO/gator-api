@@ -119,7 +119,7 @@ export function sendConditional(res: any, err: any, data?: Object, message?: str
 //  Check that a secure connection is used
 export function isSecure(req): boolean {
 
-    if (utils.config.dev() || req.secure || req.query.httpok == '1') {
+    if (utils.config.dev() || req.secure) {
         return true;
     }
 
