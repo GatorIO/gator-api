@@ -299,10 +299,12 @@ export function initialize(callback: Function) {
 
         REST.client.get('/v1/analytics/attributes', function(err: errors.APIError, apiRequest, apiResponse, result: any) {
 
-            if (err)
+            if (err) {
+                console.log('Error in reporting.init: ' + err.message);
                 callback(err);
-            else {
+            } else {
                 attributes = result.data;
+                console.log('Reporting.init successful - attribute count: ' + attributes.length);
                 callback();
             }
         });
