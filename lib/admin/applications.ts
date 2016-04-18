@@ -21,7 +21,6 @@ export class Application {
     public name: string;
     public description: string;
     public host: string;
-    public devHost: string;
     public commissions: boolean;
     public permissions: Array<Permission>;     //  the available permissions for the module
 }
