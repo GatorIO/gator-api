@@ -213,6 +213,9 @@ export function currentProject(req) {
         });
     }
 
+    if (!ret && req['session'].projects && req['session'].projects.length > 0)
+        ret = req['session'].projects[0];
+    
     return ret || null;
 }
 
