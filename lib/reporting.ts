@@ -296,8 +296,12 @@ export function getFilterOption(attrib: any): FilterOptions {
 export function initialize(callback: Function) {
 
     try {
-
-        REST.client.get('/v1/analytics/attributes', function(err: errors.APIError, apiRequest, apiResponse, result: any) {
+        var endpoint = '/v1/analytics/attributes';
+        
+        if (utils.config.settings().appId == 2)
+            endpoint = '/v1/marketshare/attributes';
+        
+        REST.client.get(endpoint, function(err: errors.APIError, apiRequest, apiResponse, result: any) {
 
             if (err) {
                 console.log('Error in reporting.init: ' + err.message);
