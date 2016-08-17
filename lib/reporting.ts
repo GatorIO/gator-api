@@ -4,6 +4,8 @@ import REST = require("./REST");
 import errors = require("./errors");
 import index = require("./index");
 
+export var API_ENDPOINT;
+
 //  Get dashboards for current project - dashboards are project/user scope
 export function currentDashboards(req) {
     var project = index.currentProject(req);
@@ -293,15 +295,15 @@ export function getFilterOption(attrib: any): FilterOptions {
     return filter;
 }
 
-export function initialize(callback: Function) {
+export function initialize(apiEndpoint: string, callback: Function) {
 
     try {
-        var endpoint = '/v1/analytics/attributes';
-        
-        if (utils.config.settings().appId == 2)
-            endpoint = '/v1/marketshare/attributes';
-        
-        REST.client.get(endpoint, function(err: errors.APIError, apiRequest, apiResponse, result: any) {
+        API_ENDPOINT = apiEndpoint;
+
+        if (API_ENDPOINT.substr(API_ENDPOINT.length - 1, 1) != '/')
+            API_ENDPOINT += '/';
+
+        REST.client.get(API_ENDPOINT + 'attributes', function(err: errors.APIError, apiRequest, apiResponse, result: any) {
 
             if (err) {
                 console.log('Error in reporting.init: ' + err.message);
@@ -338,7 +340,7 @@ export function getSegments(req, useCache: boolean, callback: (err: errors.APIEr
             return;
         }
 
-        REST.client.get('/v1/analytics/segments?accessToken=' + req.session['accessToken'], function(err: errors.APIError, apiRequest, apiResponse, result: any) {
+        REST.client.get(API_ENDPOINT + 'segments?accessToken=' + req.session['accessToken'], function(err: errors.APIError, apiRequest, apiResponse, result: any) {
 
             if (!err)
                 req.session['segments'] = result.data;
