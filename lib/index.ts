@@ -104,7 +104,7 @@ export function authenticate(req, res, next) {
                 } else {
                     req.session = null;
 
-                    if (!req['noRedirect'])
+                    if (!noRedirect)
                         res.redirect('/login');
                     else
                         return next();
