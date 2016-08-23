@@ -93,6 +93,7 @@ export class Attribute {
     searchable: boolean;
     supportedViews: Array<string>;
     logAttribute: boolean;
+    gapType: string;
 }
 
 //  segmentation filter definitions suitable for use with jQuery QueryBuilder
@@ -176,11 +177,14 @@ export function getAttributeOptions(view: string, attributeType: AttributeTypes,
     for (var a = 0; a < attribs.length; a++) {
         var attrib = attribs[a];
 
-        options.push({
-            value: attrib.name,
-            text: attrib.title,
-            optgroup: "Standard"
-        })
+        if (!isLog || attrib.logAttribute) {
+
+            options.push({
+                value: attrib.name,
+                text: attrib.title,
+                optgroup: "Standard"
+            })
+        }
     }
 
     return options;
