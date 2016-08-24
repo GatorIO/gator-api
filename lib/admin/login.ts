@@ -32,6 +32,10 @@ module.exports = function(name: string, password: string, appId: number, callbac
             else {
                 var authObject = result.data;
 
+                //  get timezone if app and user has one
+                if (authObject && authObject.user && authObject.user.timezoneId)
+                    authObject.timezone = utils.epoch.timezones[utils.epoch.getTimezoneId(authObject.user.timezoneId)];
+
                 //  set the session object for the user - changes to authObject will be reflected
                 sessions.set(authObject);
                 callback(null, authObject);
