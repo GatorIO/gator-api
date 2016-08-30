@@ -22,7 +22,8 @@ module.exports = function(params: any, callback: Function) {
             email: params['email'],
             status: 0,
             timezone: params['timezoneId'],
-            accountData: params['accountData']
+            accountData: params['accountData'],
+            accountType: params['accountType']
         };
 
         if (params['partnerId'])
