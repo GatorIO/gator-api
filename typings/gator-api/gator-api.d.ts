@@ -139,6 +139,7 @@ declare module 'gator-api' {
             public accountId:number;
             public name:string;
             public enabled:boolean;
+            public data: any;
         }
 
         export function get(params:any, callback:(err?:errors.APIError, projects?:Array<Project>) => void);
