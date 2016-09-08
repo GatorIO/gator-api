@@ -192,6 +192,8 @@ declare module 'gator-api' {
 
         apiUrl: string;
         apiVersion: string;
+
+        product: string;
     }
 
     export function login(name:string, password:string, appId:number, callback:(err?:errors.APIError, result?:Authorization) => void);

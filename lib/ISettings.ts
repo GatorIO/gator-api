@@ -11,5 +11,7 @@ interface ISettings {
 
     apiUrl: string;
     apiVersion: string;
+
+    product: string;
 }
 
