@@ -27,11 +27,11 @@ export function init(_defaultAppId: number, callback: Function) {
 
             async.each(apps, function(app: any, asyncCallback: Function) {
 
-                if (!app.reportingApiEndpoint) {
+                if (!app.reporting) {
                     asyncCallback();        //  no reporting for app
                 } else {
 
-                    let apiEndpoint = app.reportingApiEndpoint;
+                    let apiEndpoint = app.reporting.apiEndpoint;
 
                     if (apiEndpoint.substr(apiEndpoint.length - 1, 1) != '/')
                         apiEndpoint += '/';
@@ -387,9 +387,14 @@ export function getSegments(req, useCache: boolean, appId: number, callback: (er
             return;
         }
 
+        var useAppId = defaultAppId;
+
+        if (typeof appId != "undefined")
+            useAppId = +appId;
+
         applications.getAll(function(err, apps) {
 
-            var endpoint = apps[appId].reporting.apiEndpoint;
+            var endpoint = apps[useAppId].reporting.apiEndpoint;
 
             REST.client.get(endpoint + 'segments?accessToken=' + req.session['accessToken'], function(err: errors.APIError, apiRequest, apiResponse, result: any) {
 

@@ -29,14 +29,14 @@ export class Application {
     };
 }
 
-var cachedApps: Array<Application>;
+export var items: Array<Application>;
 
 export function getAll(callback: (err?: errors.APIError, result?: Array<Application>) => void) {
 
     try {
 
-        if (cachedApps)
-            callback(null, cachedApps);
+        if (items)
+            callback(null, items);
         else {
 
             client.get('/v1/applications', function(err, req: restify.Request, res: restify.Response, result: any) {
@@ -46,7 +46,7 @@ export function getAll(callback: (err?: errors.APIError, result?: Array<Applicat
                 else if (!result)                       //  then check for a missing result
                     callback(new errors.APIError());
                 else {
-                    cachedApps = result.data.applications;
+                    items = result.data.applications;
                     callback(null, result.data.applications);        //  finally, return the payload
                 }
             });

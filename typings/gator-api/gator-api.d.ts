@@ -87,6 +87,7 @@ declare module 'gator-api' {
             };
         }
 
+        export var items: Array<Application>;
         export function getAll(callback:(err?:errors.APIError, result?:Array<Application>) => void);
     }
 
@@ -269,6 +270,7 @@ declare module 'gator-api' {
             default_value:string;
         }
 
+        export var defaultAppId: number;
         export var attributes: { [appId: number] : Array<Attribute> };
 
         export enum AttributeTypes {
