@@ -82,6 +82,7 @@ declare module 'gator-api' {
             public host: string;
             public commissions: boolean;
             public permissions: Array<Permission>;     //  the available permissions for the module
+            public reportingApiEndpoint: string;
         }
 
         export function getAll(callback:(err?:errors.APIError, result?:Array<Application>) => void);
