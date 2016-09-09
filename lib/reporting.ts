@@ -31,12 +31,12 @@ export function init(_defaultAppId: number, callback: Function) {
                     asyncCallback();        //  no reporting for app
                 } else {
 
-                    let apiEndpoint = app.reporting.apiEndpoint;
+                    //  standardize endpoints with / at end
+                    if (app.reporting.apiEndpoint.substr(app.reporting.apiEndpoint.length - 1, 1) != '/') {
+                        app.reporting.apiEndpoint += '/';
+                    }
 
-                    if (apiEndpoint.substr(apiEndpoint.length - 1, 1) != '/')
-                        apiEndpoint += '/';
-
-                    REST.client.get(apiEndpoint + 'attributes', function(err: errors.APIError, apiRequest, apiResponse, result: any) {
+                    REST.client.get(app.reporting.apiEndpoint + 'attributes', function(err: errors.APIError, apiRequest, apiResponse, result: any) {
 
                         if (err) {
                             console.log('Error in getting attribs for ' + app.name + ': ' + err.message);
