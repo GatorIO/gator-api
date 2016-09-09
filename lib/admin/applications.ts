@@ -23,6 +23,10 @@ export class Application {
     public host: string;
     public commissions: boolean;
     public permissions: Array<Permission>;     //  the available permissions for the module
+
+    public reporting: {
+        apiEndpoint: string
+    };
 }
 
 var cachedApps: Array<Application>;

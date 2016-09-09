@@ -1,10 +1,67 @@
 /// <reference path="../typings/gator-utils/gator-utils.d.ts" />
+/// <reference path="../typings/async/async.d.ts" />
 import utils = require("gator-utils");
+import async = require("async");
 import REST = require("./REST");
 import errors = require("./errors");
 import index = require("./index");
+import applications = require("./admin/applications");
 
-export var API_ENDPOINT;
+export var defaultAppId: number;
+export var attributes: { [appId: number] : Array<Attribute> } = [];
+
+//  get attribute data from applications - defaultAppId specifies what attrib data to use if none
+//  specified in a report query
+export function init(_defaultAppId: number, callback: Function) {
+
+    try {
+        defaultAppId = _defaultAppId;
+
+        applications.getAll(function(err, apps: Array<applications.Application>) {
+
+            if (err) {
+                console.log('Error in reporting.init: ' + err.message);
+                callback(err);
+                return;
+            }
+
+            async.each(apps, function(app: any, asyncCallback: Function) {
+
+                if (!app.reportingApiEndpoint) {
+                    asyncCallback();        //  no reporting for app
+                } else {
+
+                    let apiEndpoint = app.reportingApiEndpoint;
+
+                    if (apiEndpoint.substr(apiEndpoint.length - 1, 1) != '/')
+                        apiEndpoint += '/';
+
+                    REST.client.get(apiEndpoint + 'attributes', function(err: errors.APIError, apiRequest, apiResponse, result: any) {
+
+                        if (err) {
+                            console.log('Error in getting attribs for ' + app.name + ': ' + err.message);
+                            asyncCallback(err);
+                        } else {
+                            attributes[app.id] = result.data;
+                            console.log('Reporting.init successful for ' + app.name + ' - attribute count: ' + attributes[app.id].length);
+                            asyncCallback();
+                        }
+                    });
+                }
+            },
+            function(err: Error) {
+                if (err) {
+                    console.log('Error in getting attribs: ' + err.message);
+                    callback(err);
+                } else {
+                    callback();
+                }
+            });
+        });
+    } catch (err) {
+        callback(err);
+    }
+}
 
 //  Get dashboards for current project - dashboards are project/user scope
 export function currentDashboards(req) {
@@ -94,6 +151,7 @@ export class Attribute {
     supportedViews: Array<string>;
     logAttribute: boolean;
     gapType: string;
+    chartOptions: Object;
 }
 
 //  segmentation filter definitions suitable for use with jQuery QueryBuilder
@@ -111,19 +169,26 @@ export class FilterOptions {
     default_value: string;
 }
 
-export var attributes: Array<Attribute> = [];
-
 export enum AttributeTypes {
     all,
     metrics,
     elements
 }
 
-export function getAttributes(view: string, attributeType: AttributeTypes, isLog: boolean): Array<Attribute> {
-    var attribs = [];
+//  get attributes for a specific applications, or default if not specified
+export function applicationAttributes(appId: number): Array<Attribute> {
 
-    for (var a = 0; a < attributes.length; a++) {
-        var attrib = attributes[a];
+    if (typeof appId != 'undefined')
+        return attributes[appId];
+
+    return attributes[defaultAppId];
+}
+
+export function getAttributes(view: string, attributeType: AttributeTypes, isLog: boolean, appId?: number): Array<Attribute> {
+    var attribs = [], appAttribs = applicationAttributes(appId);
+
+    for (var a = 0; a < appAttribs.length; a++) {
+        var attrib = appAttribs[a];
 
         if (view == 'all' || !attrib.supportedViews || attrib.supportedViews.indexOf(view) > -1) {
 
@@ -158,8 +223,8 @@ export function addAttributeView(options, view: string, attributeType: Attribute
     }
 }
 
-export function getAttributeOptions(view: string, attributeType: AttributeTypes, customAttribs: any, isLog?: boolean) {
-    var options = [], attribs = getAttributes(view, attributeType, isLog);
+export function getAttributeOptions(view: string, attributeType: AttributeTypes, customAttribs: any, isLog?: boolean, appId?: number) {
+    var options = [], attribs = getAttributes(view, attributeType, isLog, appId);
 
     //  add custom attributes
     if (customAttribs) {
@@ -205,7 +270,7 @@ export function addFilterView(filterOptions, view: string, customAttribs: any) {
     }
 }
 
-export function getFilterOptions(view: string, customAttribs: any, isLog: boolean): Array<FilterOptions> {
+export function getFilterOptions(view: string, customAttribs: any, isLog: boolean, appId?: number): Array<FilterOptions> {
     var attrib, filterOptions = [];
 
     //  add custom attributes
@@ -219,8 +284,10 @@ export function getFilterOptions(view: string, customAttribs: any, isLog: boolea
     }
 
     //  add standard attributes
-    for (var a = 0; a < attributes.length; a++) {
-        attrib = attributes[a];
+    var appAttribs = applicationAttributes(appId);
+
+    for (var a = 0; a < appAttribs.length; a++) {
+        attrib = appAttribs[a];
 
         if (attrib.filterable && (view == 'all' || !attrib.supportedViews || attrib.supportedViews.indexOf(view) > -1)) {
 
@@ -299,30 +366,6 @@ export function getFilterOption(attrib: any): FilterOptions {
     return filter;
 }
 
-export function initialize(apiEndpoint: string, callback: Function) {
-
-    try {
-        API_ENDPOINT = apiEndpoint;
-
-        if (API_ENDPOINT.substr(API_ENDPOINT.length - 1, 1) != '/')
-            API_ENDPOINT += '/';
-
-        REST.client.get(API_ENDPOINT + 'attributes', function(err: errors.APIError, apiRequest, apiResponse, result: any) {
-
-            if (err) {
-                console.log('Error in reporting.init: ' + err.message);
-                callback(err);
-            } else {
-                attributes = result.data;
-                console.log('Reporting.init successful - attribute count: ' + attributes.length);
-                callback();
-            }
-        });
-    } catch (err) {
-        callback(err);
-    }
-}
-
 //  get current segments for use in selectize
 export function getSegmentOptions(req) {
     var options = [];
@@ -334,7 +377,7 @@ export function getSegmentOptions(req) {
     return options;
 }
 
-export function getSegments(req, useCache: boolean, callback: (err: errors.APIError, segments?: Array<Segment>) => void) {
+export function getSegments(req, useCache: boolean, appId: number, callback: (err: errors.APIError, segments?: Array<Segment>) => void) {
 
     try {
 
@@ -344,14 +387,19 @@ export function getSegments(req, useCache: boolean, callback: (err: errors.APIEr
             return;
         }
 
-        REST.client.get(API_ENDPOINT + 'segments?accessToken=' + req.session['accessToken'], function(err: errors.APIError, apiRequest, apiResponse, result: any) {
+        applications.getAll(function(err, apps) {
 
-            if (!err)
-                req.session['segments'] = result.data;
-            else
-                req.session['segments'] = [];
+            var endpoint = apps[appId].reporting.apiEndpoint;
 
-            callback(err, result.data);
+            REST.client.get(endpoint + 'segments?accessToken=' + req.session['accessToken'], function(err: errors.APIError, apiRequest, apiResponse, result: any) {
+
+                if (!err)
+                    req.session['segments'] = result.data;
+                else
+                    req.session['segments'] = [];
+
+                callback(err, result.data);
+            });
         });
     } catch(err) {
         callback(err);
