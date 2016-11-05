@@ -17,7 +17,7 @@ export function log(a1, a2?, a3?, a4?, a5?) {
         if (a4) errors['data4'] = a4;
         if (a5) errors['data5'] = a5;
 
-        client.post('/v1/logs', errors, function(err, req, res) {
+        client.post('/v1/ops/logs', errors, function(err, req, res) {
 
             if (err) {
                 console.log('logger after client.post', err);
