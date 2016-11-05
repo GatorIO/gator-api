@@ -6,6 +6,7 @@ import REST = require("./REST");
 import errors = require("./errors");
 import index = require("./index");
 import applications = require("./admin/applications");
+import logger = require("./admin/logs");
 
 export var defaultAppId: number;
 export var attributes: { [appId: number] : Array<Attribute> } = [];
@@ -21,6 +22,7 @@ export function init(_defaultAppId: number, callback: Function) {
 
             if (err) {
                 console.log('Error in reporting.init: ' + err.message);
+                logger.log('AppId: ' + defaultAppId, err);
                 callback(err);
                 return;
             }
@@ -39,6 +41,7 @@ export function init(_defaultAppId: number, callback: Function) {
                     REST.client.get(app.reporting.apiEndpoint + 'attributes', function(err: errors.APIError, apiRequest, apiResponse, result: any) {
 
                         if (err) {
+                            logger.log('AppId: ' + defaultAppId, err);
                             console.log('Error in getting attribs for ' + app.name + ': ' + err.message);
                             asyncCallback(err);
                         } else {
@@ -51,6 +54,7 @@ export function init(_defaultAppId: number, callback: Function) {
             },
             function(err: Error) {
                 if (err) {
+                    logger.log('AppId: ' + defaultAppId, err);
                     console.log('Error in getting attribs: ' + err.message);
                     callback(err);
                 } else {
@@ -66,6 +70,10 @@ export function init(_defaultAppId: number, callback: Function) {
 //  Get dashboards for current project - dashboards are project/user scope
 export function currentDashboards(req) {
     var project = index.currentProject(req);
+
+    if (!project)
+        return {};
+
     var userId = req['session'].user.id;
 
     project.data = project.data || {};
@@ -78,6 +86,10 @@ export function currentDashboards(req) {
 //  Get bookmarks for current project - bookmarks are project/user scope
 export function currentBookmarks(req) {
     var project = index.currentProject(req);
+
+    if (!project)
+        return {};
+
     var userId = req['session'].user.id;
 
     project.data = project.data || {};
@@ -90,6 +102,9 @@ export function currentBookmarks(req) {
 //  Get attributes for a project - custom attributes are project scope
 export function getCustomAttributes(req, projectId) {
     var project = index.getProject(req, projectId);
+
+    if (!project)
+        return {};
 
     project.data = project.data || {};
     project.data.attributes = project.data.attributes || {};
@@ -398,10 +413,12 @@ export function getSegments(req, useCache: boolean, appId: number, callback: (er
 
             REST.client.get(endpoint + 'segments?accessToken=' + req.session['accessToken'], function(err: errors.APIError, apiRequest, apiResponse, result: any) {
 
-                if (!err)
+                if (!err) {
                     req.session['segments'] = result.data;
-                else
+                } else {
+                    logger.log('AppId: ' + useAppId, err);
                     req.session['segments'] = [];
+                }
 
                 callback(err, result.data);
             });
