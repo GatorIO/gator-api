@@ -20,6 +20,7 @@ module.exports = function(params: any, callback: Function) {
             firstName: params['firstName'],
             lastName: params['lastName'],
             email: params['email'],
+            couponId: params['couponId'],
             status: 0,
             timezone: params['timezoneId'],
             accountData: params['accountData'],
