@@ -6,8 +6,8 @@ import errors = require('../errors');
 import restify = require('restify');
 
 //  Set up least recently used session cache
-var LRU = require("lru-cache");
-var cache = LRU(1000);
+let LRU = require("lru-cache");
+let cache = LRU(1000);
 
 export function set(authObject: any) {
 
@@ -17,7 +17,7 @@ export function set(authObject: any) {
 }
 
 export function get(accessToken: any) {
-    var session = cache.get(accessToken);
+    let session = cache.get(accessToken);
 
     if (!session)
         return null;
@@ -28,4 +28,8 @@ export function get(accessToken: any) {
     }
 
     return session;
+}
+
+export function remove(accessToken: any) {
+    cache.del(accessToken);
 }
