@@ -161,8 +161,8 @@ declare module 'gator-api' {
 
     export module sessions {
         export function set(authObject:any);
-
         export function get(accessToken:string);
+        export function remove(accessToken:string);
     }
 
     export module REST {
