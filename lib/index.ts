@@ -14,23 +14,23 @@ import _reporting = require('./reporting');
 
 import _REST = require('./REST');
 
-var settings = utils.config.settings();
+let settings = utils.config.settings();
 
-export var client: restify.Client = _client;
-export var errors = _errors;
-export var users = _users;
-export var accounts = _accounts;
-export var applications = _applications;
-export var projects = _projects;
-export var reporting = _reporting;
+export let client: restify.Client = _client;
+export let errors = _errors;
+export let users = _users;
+export let accounts = _accounts;
+export let applications = _applications;
+export let projects = _projects;
+export let reporting = _reporting;
 
-export var logs = require('./admin/logs');
-export var login = require('./admin/login');
-export var signup = require('./admin/signup');
-export var sessions = require('./admin/sessions');
+export let logs = require('./admin/logs');
+export let login = require('./admin/login');
+export let signup = require('./admin/signup');
+export let sessions = require('./admin/sessions');
 
 
-export var REST = require('./REST');
+export let REST = require('./REST');
 
 export class Authorization {
     accessToken: string;
@@ -70,8 +70,9 @@ export function authenticate(req, res, next) {
     // if user is authenticated in the session, call the next() to call the next request handler
     // The session adds this method to request object. A middleware is allowed to add properties to
     // request and response objects
-    var accessToken, noRedirect = req['noRedirect'];
+    let accessToken, noRedirect = req['noRedirect'], reauthenticate = req['reauthenticate'];
     delete req['noRedirect'];
+    delete req['reauthenticate'];
 
     //  look for an access token override on the query string
     if (req.query && req.query.accessToken) {
@@ -85,9 +86,9 @@ export function authenticate(req, res, next) {
         req.session = sessions.get(accessToken);
 
         //  if the session doesn't exist, try to authorize the token, since the server may have been rebooted
-        if (!req.session) {
+        if (!req.session || reauthenticate) {
 
-            var authParams = {
+            let authParams = {
                 accessToken: accessToken,
                 noCache: true
             };
@@ -128,6 +129,12 @@ export function authenticateNoRedirect(req, res, next) {
     return authenticate(req, res, next);
 }
 
+//  authenticate but not from cache
+export function reauthenticate(req, res, next) {
+    req['reauthenticate'] = true;
+    return authenticate(req, res, next);
+}
+
 export function logout(res) {
     res.clearCookie('accessToken');
     res.redirect('/login');
@@ -147,19 +154,19 @@ export function machineId(): string {
 
     try {
 
-        var nis = require("os").networkInterfaces();
+        let nis = require("os").networkInterfaces();
 
         //  if no network interfaces, return hostname
         if (!nis)
             return require("os").hostname();
 
-        for (var iface in nis) {
+        for (let iface in nis) {
 
             if (nis.hasOwnProperty(iface)) {
 
                 if (utils.isArray(nis[iface])) {
 
-                    for (var i = 0; i < nis[iface].length; i++) {
+                    for (let i = 0; i < nis[iface].length; i++) {
 
                         if (nis[iface][i].mac && nis[iface][i].mac != '00:00:00:00:00:00') {
                             return nis[iface][i].mac;
@@ -184,7 +191,7 @@ export function getProject(req, id) {
     if (!req || !req['session'])
         return null;
 
-    var ret, projects = req['session'].projects;
+    let ret, projects = req['session'].projects;
 
     if (projects && id) {
 
@@ -203,7 +210,7 @@ export function currentProject(req) {
     if (!req || !req['session'])
         return null;
 
-    var ret, projects = req['session'].projects, id = req['session'].currentProjectId;
+    let ret, projects = req['session'].projects, id = req['session'].currentProjectId;
 
     if (projects && id) {
 
@@ -234,13 +241,13 @@ export function hasAdminPermission(req, permission: string): boolean {
         //  2)  The user has been assigned the specific permission
         if (!req || !req.session || !req.session.user || !req.session.user.permissions)
             return false;
-        
-        var user = req.session.user;
+
+        let user = req.session.user;
 
         if (user.appId != 1)
             return false;
         
-        for (var p = 0; p < user.permissions.length; p++) {
+        for (let p = 0; p < user.permissions.length; p++) {
 
             //  Check for a specific permission - for admin checks DO NOT check for owner status
             if (user.permissions[p] == 'admin' || user.permissions[p] == permission)

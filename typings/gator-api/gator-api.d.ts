@@ -210,6 +210,7 @@ declare module 'gator-api' {
     }
 
     export function authenticate(req, res, next);
+    export function reauthenticate(req, res, next);
     export function authenticateNoRedirect(req, res, next);
     export function signup(params:any, callback:(err?:errors.APIError, result?:Authorization) => void);
     export function setSessionCookie(res:any, accessToken:string);
