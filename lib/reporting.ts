@@ -8,8 +8,8 @@ import index = require("./index");
 import applications = require("./admin/applications");
 import logger = require("./admin/logs");
 
-export var defaultAppId: number;
-export var attributes: { [appId: number] : Array<Attribute> } = [];
+export let defaultAppId: number;
+export let attributes: { [appId: number] : Array<Attribute> } = [];
 
 //  get attribute data from applications - defaultAppId specifies what attrib data to use if none
 //  specified in a report query
@@ -69,12 +69,12 @@ export function init(_defaultAppId: number, callback: Function) {
 
 //  Get dashboards for current project - dashboards are project/user scope
 export function currentDashboards(req) {
-    var project = index.currentProject(req);
+    let project = index.currentProject(req);
 
     if (!project)
         return {};
 
-    var userId = req['session'].user.id;
+    let userId = req['session'].user.id;
 
     project.data = project.data || {};
     project.data[userId] = project.data[userId] || {};
@@ -85,12 +85,12 @@ export function currentDashboards(req) {
 
 //  Get bookmarks for current project - bookmarks are project/user scope
 export function currentBookmarks(req) {
-    var project = index.currentProject(req);
+    let project = index.currentProject(req);
 
     if (!project)
         return {};
 
-    var userId = req['session'].user.id;
+    let userId = req['session'].user.id;
 
     project.data = project.data || {};
     project.data[userId] = project.data[userId] || {};
@@ -101,7 +101,7 @@ export function currentBookmarks(req) {
 
 //  Get attributes for a project - custom attributes are project scope
 export function getCustomAttributes(req, projectId) {
-    var project = index.getProject(req, projectId);
+    let project = index.getProject(req, projectId);
 
     if (!project)
         return {};
@@ -111,7 +111,7 @@ export function getCustomAttributes(req, projectId) {
     return project.data.attributes;
 }
 
-export var Operators = {
+export let Operators = {
     equal: 'equal',
     not_equal: 'not_equal',
     begins_with: 'begins_with',
@@ -139,7 +139,7 @@ export class Segment {
     global: boolean;
 }
 
-export var DataTypes = {
+export let DataTypes = {
     string: 'string',
     integer: 'integer',
     numeric: 'numeric',
@@ -200,10 +200,10 @@ export function applicationAttributes(appId: number): Array<Attribute> {
 }
 
 export function getAttributes(view: string, attributeType: AttributeTypes, isLog: boolean, appId?: number): Array<Attribute> {
-    var attribs = [], appAttribs = applicationAttributes(appId);
+    let attribs = [], appAttribs = applicationAttributes(appId);
 
-    for (var a = 0; a < appAttribs.length; a++) {
-        var attrib = appAttribs[a];
+    for (let a = 0; a < appAttribs.length; a++) {
+        let attrib = appAttribs[a];
 
         if (view == 'all' || !attrib.supportedViews || attrib.supportedViews.indexOf(view) > -1) {
 
@@ -220,11 +220,11 @@ export function getAttributes(view: string, attributeType: AttributeTypes, isLog
 
 export function addAttributeView(options, view: string, attributeType: AttributeTypes, customAttribs: any) {
 
-    for (var name in customAttribs[view]) {
+    for (let name in customAttribs[view]) {
 
         if (customAttribs[view].hasOwnProperty(name)) {
 
-            var attrib = customAttribs[view][name];
+            let attrib = customAttribs[view][name];
 
             if ((attributeType == AttributeTypes.all) || (attributeType == AttributeTypes.elements && attrib.isElement) || (attributeType == AttributeTypes.metrics && attrib.isMetric)) {
 
@@ -239,7 +239,7 @@ export function addAttributeView(options, view: string, attributeType: Attribute
 }
 
 export function getAttributeOptions(view: string, attributeType: AttributeTypes, customAttribs: any, isLog?: boolean, appId?: number) {
-    var options = [], attribs = getAttributes(view, attributeType, isLog, appId);
+    let options = [], attribs = getAttributes(view, attributeType, isLog, appId);
 
     //  add custom attributes
     if (customAttribs) {
@@ -254,8 +254,8 @@ export function getAttributeOptions(view: string, attributeType: AttributeTypes,
     }
 
     //  add standard attributes
-    for (var a = 0; a < attribs.length; a++) {
-        var attrib = attribs[a];
+    for (let a = 0; a < attribs.length; a++) {
+        let attrib = attribs[a];
 
         if (!isLog || attrib.logAttribute) {
 
@@ -272,11 +272,11 @@ export function getAttributeOptions(view: string, attributeType: AttributeTypes,
 
 export function addFilterView(filterOptions, view: string, customAttribs: any) {
 
-    for (var name in customAttribs[view]) {
+    for (let name in customAttribs[view]) {
 
         if (customAttribs[view].hasOwnProperty(name) && customAttribs[view][name].filterable) {
 
-            var attrib = customAttribs[view][name];
+            let attrib = customAttribs[view][name];
             attrib.title = view + ': ' + name;
             attrib.name = view + '.' + name;
 
@@ -286,7 +286,7 @@ export function addFilterView(filterOptions, view: string, customAttribs: any) {
 }
 
 export function getFilterOptions(view: string, customAttribs: any, isLog: boolean, appId?: number): Array<FilterOptions> {
-    var attrib, filterOptions = [];
+    let attrib, filterOptions = [];
 
     //  add custom attributes
     if (customAttribs) {
@@ -299,9 +299,9 @@ export function getFilterOptions(view: string, customAttribs: any, isLog: boolea
     }
 
     //  add standard attributes
-    var appAttribs = applicationAttributes(appId);
+    let appAttribs = applicationAttributes(appId);
 
-    for (var a = 0; a < appAttribs.length; a++) {
+    for (let a = 0; a < appAttribs.length; a++) {
         attrib = appAttribs[a];
 
         if (attrib.filterable && (view == 'all' || !attrib.supportedViews || attrib.supportedViews.indexOf(view) > -1)) {
@@ -317,7 +317,7 @@ export function getFilterOptions(view: string, customAttribs: any, isLog: boolea
 
 export function getFilterOption(attrib: any): FilterOptions {
 
-    var filter = new FilterOptions();
+    let filter = new FilterOptions();
     filter.id = attrib.name;
     filter.label = attrib.title || attrib.name;
     filter.description = attrib.description || attrib.name;
@@ -383,9 +383,9 @@ export function getFilterOption(attrib: any): FilterOptions {
 
 //  get current segments for use in selectize
 export function getSegmentOptions(req) {
-    var options = [];
+    let options = [];
 
-    for (var r = 0; r < req.session.segments.length; r++) {
+    for (let r = 0; r < req.session.segments.length; r++) {
         options.push({ value: req.session.segments[r].id, text: req.session.segments[r].name });
     }
 
@@ -402,14 +402,14 @@ export function getSegments(req, useCache: boolean, appId: number, callback: (er
             return;
         }
 
-        var useAppId = defaultAppId;
+        let useAppId = defaultAppId;
 
         if (typeof appId != "undefined")
             useAppId = +appId;
 
         applications.getAll(function(err, apps) {
 
-            var endpoint = apps[useAppId].reporting.apiEndpoint;
+            let endpoint = apps[useAppId].reporting.apiEndpoint;
 
             REST.client.get(endpoint + 'segments?accessToken=' + req.session['accessToken'], function(err: errors.APIError, apiRequest, apiResponse, result: any) {
 
