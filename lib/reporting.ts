@@ -46,7 +46,7 @@ export function init(callback: Function) {
                     app.reporting.apiEndpoint += '/';
                 }
 
-                REST.client.get(app.reporting.apiEndpoint + 'attributes', function (err: errors.APIError, apiRequest, apiResponse, result: any) {
+                REST.client.get(app.reporting.apiEndpoint + 'entities', function (err: errors.APIError, apiRequest, apiResponse, result: any) {
 
                     if (err) {
                         logger.log('Error in getting entitites for ' + app.name, err);
