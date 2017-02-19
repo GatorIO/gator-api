@@ -8,59 +8,57 @@ import index = require("./index");
 import applications = require("./admin/applications");
 import logger = require("./admin/logs");
 
-export let defaultAppId: number;
-export let attributes: { [appId: number] : Array<Attribute> } = [];
+let settings = utils.config.settings();
 
-//  get attribute data from applications - defaultAppId specifies what attrib data to use if none
-//  specified in a report query
-export function init(_defaultAppId: number, callback: Function) {
+export interface IEntity {
+    name: string
+    attributes: Array<Attribute>;
+    dictionaries: any;
+}
+
+export interface IEntities {
+    [name: string]: IEntity;
+}
+
+export let entities: { [name: string] : any } = {};
+
+export function init(callback: Function) {
 
     try {
-        defaultAppId = _defaultAppId;
 
         applications.getAll(function(err, apps: Array<applications.Application>) {
 
             if (err) {
                 console.log('Error in reporting.init: ' + err.message);
-                logger.log('AppId: ' + defaultAppId, err);
+                logger.log('Error in reporting.init: ', err);
                 callback(err);
                 return;
             }
 
-            async.each(apps, function(app: any, asyncCallback: Function) {
+            let app = apps[settings.appId];
 
-                if (!app.reporting) {
-                    asyncCallback();        //  no reporting for app
-                } else {
+            if (!app.reporting) {
+                callback();        //  no reporting for app, so just callback
+            } else {
 
-                    //  standardize endpoints with / at end
-                    if (app.reporting.apiEndpoint.substr(app.reporting.apiEndpoint.length - 1, 1) != '/') {
-                        app.reporting.apiEndpoint += '/';
+                //  standardize endpoints with / at end
+                if (app.reporting.apiEndpoint.substr(app.reporting.apiEndpoint.length - 1, 1) != '/') {
+                    app.reporting.apiEndpoint += '/';
+                }
+
+                REST.client.get(app.reporting.apiEndpoint + 'attributes', function (err: errors.APIError, apiRequest, apiResponse, result: any) {
+
+                    if (err) {
+                        logger.log('Error in getting entitites for ' + app.name, err);
+                        console.log('Error in getting entitites for ' + app.name + ': ' + err.message);
+                        callback(err);
+                    } else {
+                        entities = result.data;
+                        console.log('Reporting.init successful for ' + app.name);
+                        callback();
                     }
-
-                    REST.client.get(app.reporting.apiEndpoint + 'attributes', function(err: errors.APIError, apiRequest, apiResponse, result: any) {
-
-                        if (err) {
-                            logger.log('AppId: ' + defaultAppId, err);
-                            console.log('Error in getting attribs for ' + app.name + ': ' + err.message);
-                            asyncCallback(err);
-                        } else {
-                            attributes[app.id] = result.data;
-                            console.log('Reporting.init successful for ' + app.name + ' - attribute count: ' + attributes[app.id].length);
-                            asyncCallback();
-                        }
-                    });
-                }
-            },
-            function(err: Error) {
-                if (err) {
-                    logger.log('AppId: ' + defaultAppId, err);
-                    console.log('Error in getting attribs: ' + err.message);
-                    callback(err);
-                } else {
-                    callback();
-                }
-            });
+                });
+            }
         });
     } catch (err) {
         callback(err);
@@ -190,28 +188,16 @@ export enum AttributeTypes {
     elements
 }
 
-//  get attributes for a specific applications, or default if not specified
-export function applicationAttributes(appId: number): Array<Attribute> {
-
-    if (typeof appId != 'undefined')
-        return attributes[appId];
-
-    return attributes[defaultAppId];
-}
-
-export function getAttributes(view: string, attributeType: AttributeTypes, isLog: boolean, appId?: number): Array<Attribute> {
-    let attribs = [], appAttribs = applicationAttributes(appId);
+export function getAttributes(entityName: string, attributeType: AttributeTypes, isLog: boolean, appId?: number): Array<Attribute> {
+    let attribs = [], appAttribs = applications[settings.appId].reporting.entities[entityName].attributes;
 
     for (let a = 0; a < appAttribs.length; a++) {
         let attrib = appAttribs[a];
 
-        if (view == 'all' || !attrib.supportedViews || attrib.supportedViews.indexOf(view) > -1) {
+        if (attributeType == AttributeTypes.all || (attributeType == AttributeTypes.metrics && attrib.isMetric) || (attributeType == AttributeTypes.elements && attrib.isElement)) {
 
-            if (attributeType == AttributeTypes.all || (attributeType == AttributeTypes.metrics && attrib.isMetric) || (attributeType == AttributeTypes.elements && attrib.isElement)) {
-
-                if (!isLog || attrib.logAttribute)
-                    attribs.push(attrib);
-            }
+            if (!isLog || attrib.logAttribute)
+                attribs.push(attrib);
         }
     }
 
@@ -285,7 +271,7 @@ export function addFilterView(filterOptions, view: string, customAttribs: any) {
     }
 }
 
-export function getFilterOptions(view: string, customAttribs: any, isLog: boolean, appId?: number): Array<FilterOptions> {
+export function getFilterOptions(entityName: string, customAttribs: any, isLog: boolean, appId?: number): Array<FilterOptions> {
     let attrib, filterOptions = [];
 
     //  add custom attributes
@@ -293,22 +279,19 @@ export function getFilterOptions(view: string, customAttribs: any, isLog: boolea
 
         addFilterView(filterOptions, 'session', customAttribs);
 
-        if (view == 'events') {
+        if (entityName == 'events') {
             addFilterView(filterOptions, 'event', customAttribs);
         }
     }
 
     //  add standard attributes
-    let appAttribs = applicationAttributes(appId);
+    let appAttribs = applications[settings.appId].entities[entityName].attributes;
 
     for (let a = 0; a < appAttribs.length; a++) {
         attrib = appAttribs[a];
 
-        if (attrib.filterable && (view == 'all' || !attrib.supportedViews || attrib.supportedViews.indexOf(view) > -1)) {
-
-            if (!isLog || attrib.logAttribute) {
-                filterOptions.push(getFilterOption(attrib));
-            }
+        if (!isLog || attrib.logAttribute) {
+            filterOptions.push(getFilterOption(attrib));
         }
     }
 
@@ -402,21 +385,16 @@ export function getSegments(req, useCache: boolean, appId: number, callback: (er
             return;
         }
 
-        let useAppId = defaultAppId;
-
-        if (typeof appId != "undefined")
-            useAppId = +appId;
-
         applications.getAll(function(err, apps) {
 
-            let endpoint = apps[useAppId].reporting.apiEndpoint;
+            let endpoint = apps[settings.appId].reporting.apiEndpoint;
 
             REST.client.get(endpoint + 'segments?accessToken=' + req.session['accessToken'], function(err: errors.APIError, apiRequest, apiResponse, result: any) {
 
                 if (!err) {
                     req.session['segments'] = result.data;
                 } else {
-                    logger.log('AppId: ' + useAppId, err);
+                    logger.log(err);
                     req.session['segments'] = [];
                 }
 

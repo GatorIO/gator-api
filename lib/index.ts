@@ -186,7 +186,7 @@ export function machineId(): string {
 }
 
 //  Return a project object based on an id
-export function getProject(req, id) {
+export function     getProject(req, id) {
 
     if (!req || !req['session'])
         return null;
