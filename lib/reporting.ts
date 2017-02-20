@@ -231,7 +231,7 @@ export function getAttributeOptions(entityName: string, attributeType: Attribute
     if (customAttribs) {
         addAttributeView(options, 'session', attributeType, customAttribs);
 
-        if (view == 'events') {
+        if (entityName == 'events') {
             addAttributeView(options, 'event', attributeType, customAttribs);
         }
 
