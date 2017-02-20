@@ -161,7 +161,7 @@ export class Attribute {
     inputFormat: string;
     filterable: boolean;
     searchable: boolean;
-    supportedViews: Array<string>;
+    supportedEntities: Array<string>;
     logAttribute: boolean;
     gapType: string;
     chartOptions: Object;
@@ -188,8 +188,8 @@ export enum AttributeTypes {
     elements
 }
 
-export function getAttributes(entityName: string, attributeType: AttributeTypes, isLog: boolean, appId?: number): Array<Attribute> {
-    let attribs = [], appAttribs = applications[settings.appId].reporting.entities[entityName].attributes;
+export function getAttributes(entityName: string, attributeType: AttributeTypes, isLog: boolean): Array<Attribute> {
+    let attribs = [], appAttribs = entities[entityName].attributes;
 
     for (let a = 0; a < appAttribs.length; a++) {
         let attrib = appAttribs[a];
@@ -204,19 +204,19 @@ export function getAttributes(entityName: string, attributeType: AttributeTypes,
     return attribs;
 }
 
-export function addAttributeView(options, view: string, attributeType: AttributeTypes, customAttribs: any) {
+export function addAttributeView(options, entityName: string, attributeType: AttributeTypes, customAttribs: any) {
 
-    for (let name in customAttribs[view]) {
+    for (let name in customAttribs[entityName]) {
 
-        if (customAttribs[view].hasOwnProperty(name)) {
+        if (customAttribs[entityName].hasOwnProperty(name)) {
 
-            let attrib = customAttribs[view][name];
+            let attrib = customAttribs[entityName][name];
 
             if ((attributeType == AttributeTypes.all) || (attributeType == AttributeTypes.elements && attrib.isElement) || (attributeType == AttributeTypes.metrics && attrib.isMetric)) {
 
                 options.push({
-                    value: view + '.' + name,
-                    text: view + ': ' + name,
+                    value: entityName + '.' + name,
+                    text: entityName + ': ' + name,
                     optgroup: "Custom"
                 })
             }
@@ -224,8 +224,8 @@ export function addAttributeView(options, view: string, attributeType: Attribute
     }
 }
 
-export function getAttributeOptions(view: string, attributeType: AttributeTypes, customAttribs: any, isLog?: boolean, appId?: number) {
-    let options = [], attribs = getAttributes(view, attributeType, isLog, appId);
+export function getAttributeOptions(entityName: string, attributeType: AttributeTypes, customAttribs: any, isLog?: boolean) {
+    let options = [], attribs = getAttributes(entityName, attributeType, isLog);
 
     //  add custom attributes
     if (customAttribs) {
@@ -236,7 +236,6 @@ export function getAttributeOptions(view: string, attributeType: AttributeTypes,
         }
 
         addAttributeView(options, 'person', attributeType, customAttribs);
-
     }
 
     //  add standard attributes
@@ -256,22 +255,22 @@ export function getAttributeOptions(view: string, attributeType: AttributeTypes,
     return options;
 }
 
-export function addFilterView(filterOptions, view: string, customAttribs: any) {
+export function addFilterView(filterOptions, entityName: string, customAttribs: any) {
 
-    for (let name in customAttribs[view]) {
+    for (let name in customAttribs[entityName]) {
 
-        if (customAttribs[view].hasOwnProperty(name) && customAttribs[view][name].filterable) {
+        if (customAttribs[entityName].hasOwnProperty(name) && customAttribs[entityName][name].filterable) {
 
-            let attrib = customAttribs[view][name];
-            attrib.title = view + ': ' + name;
-            attrib.name = view + '.' + name;
+            let attrib = customAttribs[entityName][name];
+            attrib.title = entityName + ': ' + name;
+            attrib.name = entityName + '.' + name;
 
             filterOptions.push(getFilterOption(attrib));
         }
     }
 }
 
-export function getFilterOptions(entityName: string, customAttribs: any, isLog: boolean, appId?: number): Array<FilterOptions> {
+export function getFilterOptions(entityName: string, customAttribs: any, isLog: boolean): Array<FilterOptions> {
     let attrib, filterOptions = [];
 
     //  add custom attributes
@@ -285,7 +284,7 @@ export function getFilterOptions(entityName: string, customAttribs: any, isLog: 
     }
 
     //  add standard attributes
-    let appAttribs = applications[settings.appId].entities[entityName].attributes;
+    let appAttribs = entities[entityName].attributes;
 
     for (let a = 0; a < appAttribs.length; a++) {
         attrib = appAttribs[a];

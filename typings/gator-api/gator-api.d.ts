@@ -250,7 +250,7 @@ declare module 'gator-api' {
             inputFormat:string;
             filterable:boolean;
             searchable:boolean;
-            supportedViews:Array<string>;
+            supportedEntities:Array<string>;
             logAttribute:boolean;
             gapType: string;
             chartOptions: Object;
@@ -290,11 +290,11 @@ declare module 'gator-api' {
         }
 
         export function init(callback:Function);
-        export function getAttributes(view:string, attributeType:AttributeTypes, isLog:boolean, appId?:number): Array<Attribute>;
-        export function addAttributeView(options, view:string, attributeType:AttributeTypes, customAttribs:any);
-        export function getAttributeOptions(view:string, attributeType:AttributeTypes, customAttribs:any, isLog?:boolean, appId?:number);
-        export function addFilterView(filterOptions, view:string, customAttribs:any);
-        export function getFilterOptions(view:string, customAttribs:any, isLog:boolean, appId?:number):Array<FilterOptions>;
+        export function getAttributes(entityName:string, attributeType:AttributeTypes, isLog:boolean): Array<Attribute>;
+        export function addAttributeView(options, entityName:string, attributeType:AttributeTypes, customAttribs:any);
+        export function getAttributeOptions(entityName:string, attributeType:AttributeTypes, customAttribs:any, isLog?:boolean);
+        export function addFilterView(filterOptions, entityName:string, customAttribs:any);
+        export function getFilterOptions(entityName:string, customAttribs:any, isLog:boolean):Array<FilterOptions>;
         export function getFilterOption(attrib:any):FilterOptions;
         export function getSegmentOptions(req);
         export function getSegments(req, useCache: boolean, appId: number, callback: (err: errors.APIError, segments?: Array<Segment>) => void);
