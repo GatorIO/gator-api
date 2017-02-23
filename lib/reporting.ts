@@ -289,8 +289,11 @@ export function getFilterOptions(entityName: string, customAttribs: any, isLog: 
     for (let a = 0; a < appAttribs.length; a++) {
         attrib = appAttribs[a];
 
-        if (!isLog || attrib.logAttribute) {
-            filterOptions.push(getFilterOption(attrib));
+        if (attrib.filterable) {
+
+            if (!isLog || attrib.logAttribute) {
+                filterOptions.push(getFilterOption(attrib));
+            }
         }
     }
 
