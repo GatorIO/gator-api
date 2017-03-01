@@ -282,6 +282,7 @@ declare module 'gator-api' {
         }
 
         export let entities: { [name: string] : any };
+        export let dictionaries: { [name: string] : any };
 
         export enum AttributeTypes {
             all,

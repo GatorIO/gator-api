@@ -21,6 +21,7 @@ export interface IEntities {
 }
 
 export let entities: { [name: string] : any } = {};
+export let dictionaries: { [name: string] : any } = {};
 
 export function init(callback: Function) {
 
@@ -54,8 +55,19 @@ export function init(callback: Function) {
                         callback(err);
                     } else {
                         entities = result.data;
-                        console.log('Reporting.init successful for ' + app.name);
-                        callback();
+
+                        REST.client.get(app.reporting.apiEndpoint + 'dictionaries', function (err: errors.APIError, apiRequest, apiResponse, result: any) {
+
+                            if (err) {
+                                logger.log('Error in getting dictionaries for ' + app.name, err);
+                                console.log('Error in getting dictionaries for ' + app.name + ': ' + err.message);
+                                callback(err);
+                            } else {
+                                dictionaries = result.data;
+                                console.log('Reporting.init successful for ' + app.name);
+                                callback();
+                            }
+                        });
                     }
                 });
             }
