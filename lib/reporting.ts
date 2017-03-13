@@ -312,6 +312,23 @@ export function getFilterOptions(entityName: string, customAttribs: any, isLog: 
     return filterOptions;
 }
 
+//  return attribs with rule = true (used for app-specific rulesets, like order filters)
+export function getRuleOptions(entityName: string): Array<FilterOptions> {
+    let attrib, ruleOptions = [];
+
+    let appAttribs = entities[entityName].attributes;
+
+    for (let a = 0; a < appAttribs.length; a++) {
+        attrib = appAttribs[a];
+
+        if (attrib.rule) {
+            ruleOptions.push(getFilterOption(attrib));
+        }
+    }
+
+    return ruleOptions;
+}
+
 export function getFilterOption(attrib: any): FilterOptions {
 
     let filter = new FilterOptions();

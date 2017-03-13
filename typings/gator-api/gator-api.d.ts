@@ -297,6 +297,7 @@ declare module 'gator-api' {
         export function addFilterView(filterOptions, entityName:string, customAttribs:any);
         export function getFilterOptions(entityName:string, customAttribs:any, isLog:boolean):Array<FilterOptions>;
         export function getFilterOption(attrib:any):FilterOptions;
+        export function getRuleOptions(entityName: string): Array<FilterOptions>;
         export function getSegmentOptions(req);
         export function getSegments(req, useCache: boolean, appId: number, callback: (err: errors.APIError, segments?: Array<Segment>) => void);
     }
