@@ -313,7 +313,7 @@ export function getFilterOptions(entityName: string, customAttribs: any, isLog: 
 }
 
 //  return attribs with rule = true (used for app-specific rulesets, like order filters)
-export function getRuleOptions(entityName: string): Array<FilterOptions> {
+export function getRuleOptions(entityName: string, isLog:boolean): Array<FilterOptions> {
     let attrib, ruleOptions = [];
 
     let appAttribs = entities[entityName].attributes;
@@ -322,7 +322,9 @@ export function getRuleOptions(entityName: string): Array<FilterOptions> {
         attrib = appAttribs[a];
 
         if (attrib.rule) {
-            ruleOptions.push(getFilterOption(attrib));
+
+            if (!isLog || attrib.logAttribute)
+                ruleOptions.push(getFilterOption(attrib));
         }
     }
 
