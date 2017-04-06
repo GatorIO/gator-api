@@ -1,5 +1,3 @@
-/// <reference path="../restify/restify.d.ts" />
-
 declare module 'gator-api' {
     import restify = require('restify');
 

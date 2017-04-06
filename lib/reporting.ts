@@ -1,5 +1,3 @@
-/// <reference path="../typings/gator-utils/gator-utils.d.ts" />
-/// <reference path="../typings/async/async.d.ts" />
 import utils = require("gator-utils");
 import async = require("async");
 import REST = require("./REST");

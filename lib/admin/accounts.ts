@@ -1,4 +1,3 @@
-/// <reference path="../../typings/restify/restify.d.ts" />
 import client = require('../client');
 import errors = require('../errors');
 import restify = require('restify');

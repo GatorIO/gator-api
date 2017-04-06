@@ -19,10 +19,15 @@
   "engines": {
     "node": ">=4.2.0"
   },
+  "types": "./gator-api.d.ts",
   "dependencies": {
-    "async": "^2.2.0",
+    "@types/node": "^6.0.68",
+    "@types/async": "^2.0.40",
+    "async": "^2.3.0",
+    "@types/lru-cache": "^2.5.32",
     "lru-cache": "^4.0.2",
     "gator-utils": "GatorIO/gator-utils",
+    "@types/restify": "^2.0.42",
     "restify": "^4.3.0"
   },
   "license" : "MIT"

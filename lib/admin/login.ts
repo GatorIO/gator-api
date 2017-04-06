@@ -1,5 +1,3 @@
-/// <reference path="../../typings/restify/restify.d.ts" />
-/// <reference path="../../typings/gator-utils/gator-utils.d.ts" />
 import utils = require('gator-utils');
 import restify = require('restify');
 import client = require('../client');

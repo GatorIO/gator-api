@@ -1,4 +1,3 @@
-/// <reference path="../../typings/gator-utils/gator-utils.d.ts" />
 import utils = require('gator-utils');
 import users = require('./users');
 import accounts = require('./accounts');
