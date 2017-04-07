@@ -1,0 +1,847 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Administration API",
+        "description": "User/account/project provisioning and authentication",
+        "version": "1.0.0"
+    },
+    "host": "api.gator.io",
+    "schemes": [
+        "https"
+    ],
+    "basePath": "/v1",
+    "tags":[
+        {"name": "Administration","description": "Manage users, accounts and security"}
+    ],
+    "securityDefinitions": {
+        "accessToken": {
+            "type": "apiKey",
+            "name": "accessToken",
+            "in": "header"
+        }
+    },
+    "security": [
+        {
+            "accessToken": []
+        }
+    ],
+    "paths": {
+        "/users": {
+            "post": {
+                "tags": ["Administration"],
+                "summary": "Create a new user.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The user parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A user object",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "The user already exists",
+                        "schema": {
+                            "$ref": "#/definitions/DuplicateError"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["Administration"],
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Update an authenticated user.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The default user change parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserUpdateParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/defaultproject": {
+            "post": {
+                "tags": ["Administration"],
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Set the default project for a user.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The default project parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DefaultProjectParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/password": {
+            "put": {
+                "tags": ["Administration"],
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Change the password for an authenticated user account.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The default password change parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PasswordParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/name": {
+            "put": {
+                "tags": ["Administration"],
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Change the name of an authenticated user.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The default user name change parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserNameParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/projects": {
+            "post": {
+                "tags": ["Administration"],
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Create a new project for a user.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The project parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ProjectCreateParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A project object",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "The project already exists",
+                        "schema": {
+                            "$ref": "#/definitions/DuplicateError"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["Administration"],
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Update an existing project.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The project parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ProjectUpdateParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A project object",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{id}": {
+
+            "delete": {
+                "tags": ["Administration"],
+                "summary": "Delete a project.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "string",
+                        "description": "The project id to delete.",
+                        "required": true
+                    },
+                    {
+                        "name": "accessToken",
+                        "in": "query",
+                        "type": "string",
+                        "description": "The access token of the owner of the account for the request.  This can be generated from the /login call.",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": ["Administration"],
+                "summary": "Authenticate a user/password",
+                "description": "This call authorizes a user/password combination and returns an access token and a user object.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The login parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/LoginParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login data, which is access token and the user's information",
+                        "schema": {
+                            "$ref": "#/definitions/Login"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/authorize": {
+            "post": {
+                "tags": ["Administration"],
+                "summary": "Authenticate a user and get credentials from a token.",
+                "description": "This call returns a user object with credential information based on an access token (generally created by the /login call).",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The authorization parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AuthorizeParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A user object with credential information",
+                        "schema": {
+                            "$ref": "#/definitions/Authorization"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/accesstokens": {
+            "get": {
+                "tags": ["Administration"],
+                "summary": "Get all the access tokens for a user.",
+                "parameters": [
+                    {
+                        "name": "accessToken",
+                        "in": "query",
+                        "type": "string",
+                        "description": "The access token",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Administration"],
+                "summary": "Create an access token for a project.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The access token parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AccessTokenCreateParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/accesstokens/{revokeToken}": {
+
+            "delete": {
+                "tags": ["Administration"],
+                "summary": "Revoke an access token.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "revokeToken",
+                        "type": "string",
+                        "description": "The access token to revoke",
+                        "required": true
+                    },
+                    {
+                        "name": "accessToken",
+                        "in": "query",
+                        "type": "string",
+                        "description": "The access token of the owner of the account for the request.  This can be generated from the /login call.",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/applications": {
+            "get": {
+                "tags": ["Administration"],
+                "summary": "Get all apps",
+                "responses": {
+                    "200": {
+                        "description": "An array of apps",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Application"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/verifications": {
+            "post": {
+                "tags": ["Administration"],
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Create an email verification.",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The verification parameters",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/VerificationCreateParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A unique key for the verification",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/verifications/{key}": {
+            "get": {
+                "tags": ["Administration"],
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "Complete an email verification and return the associated data.",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "type": "string",
+                        "description": "The key returned from the verification start call.",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The data associated with the verification",
+                        "schema": {
+                            "$ref": "#/definitions/APIResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/APIError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "AccessTokenCreateParams": {
+            "type": "object",
+            "required": [
+                "accessToken",
+                "projectId",
+                "permissions"
+            ],
+            "properties": {
+                "accessToken": {
+                    "type": "string",
+                    "description": "The access token from the owner of the account.  This can be generated from the /login call."
+                },
+                "projectId": {
+                    "type": "integer",
+                    "description": "The projectId to grant rights to."
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [ "push", "query"]
+                    },
+                    "description": "The permissions to grant, which are push and query."
+                }
+            }
+        },
+        "APIResponse": {
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "Login": {
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "expiration": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/User"
+                }
+            }
+        },
+        "APIError": {
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "DuplicateError": {
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "Application": {
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "AuthorizeParams": {
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "LoginParams": {
+            "type": "object",
+            "required": [
+                "name",
+                "password"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "format": "email",
+                    "default": "user@email.com"
+                },
+                "password": {
+                    "type": "string",
+                    "format": "password"
+                },
+                "appId": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "expiration": {
+                    "type": "string",
+                    "description": "The UTC date of when the token should expire",
+                    "default": (new Date(new Date().getTime() + 8 * 60 * 60000)).toUTCString()
+                }
+            }
+        },
+        "UserParams": {
+            "required": [
+                "appId",
+                "name",
+                "password"
+            ],
+            "properties": {
+                "appId": {
+                    "type": "integer",
+                    "description": "The application id."
+                },
+                "name": {
+                    "type": "string",
+                    "format": "email",
+                    "default": "user@email.com"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "The email to use to communicate with the user.  If this is not provided, the user's name is used."
+                },
+                "password": {
+                    "type": "string",
+                },
+                "status": {
+                    "type": "integer",
+                    "description": "0 = enabled",
+                    "default": 0
+                }
+            }
+        },
+        "User": {
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The user name, which is the user's email address."
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "The email to use to communicate with the user.  If this is not provided, the user's name is used."
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "account": {
+                    "type": "object"
+                },
+                "projects": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "ProjectCreateParams": {
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "DefaultProjectParams": {
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "PasswordParams": {
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "oldPassword": {
+                    "type": "string"
+                },
+                "newPassword": {
+                    "type": "string"
+                }
+            }
+        },
+        "ProjectUpdateParams": {
+            "required": [
+                "accessToken",
+                "id"
+            ],
+            "properties": {
+                "accessToken": {
+                    "type": "string",
+                },
+                "id": {
+                    "type": "integer",
+                },
+                "name": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "UserNameParams": {
+            "required": [
+                "accessToken",
+                "name"
+            ],
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The new user name"
+                }
+            }
+        },
+        "VerificationCreateParams": {
+            "required": [
+                "email",
+                "templateName",
+                "data"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "description": "The email address to send the verification to."
+                },
+                "templateName": {
+                    "type": "string",
+                    "description": "The internal template name to use for the email sent."
+                },
+                "data": {
+                    "type": "object",
+                    "description": "An object containing data to store with the verification.",
+                    "default": {
+                        "firstName": "John"
+                    }
+                }
+            }
+        },
+        "UserUpdateParams": {
+            "required": [
+                "accessToken",
+                "user"
+            ],
+            "properties": {
+                "accessToken": {
+                    "type": "string",
+                },
+                "user": {
+                    "type": "object",
+                    "description": "An object containing the user attributes to update.  Currently supported attributes are firstName, lastName, and email.",
+                    "default": {
+                        "firstName": "Jane",
+                        "lastName": "Smith",
+                        "email": "jane@company.com"
+                    }
+                }
+            }
+        },
+        "Authorization": {
+            "properties": {
+                "expiration": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/User"
+                }
+            }
+        }
+    }
+}
