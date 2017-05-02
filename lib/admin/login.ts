@@ -1,7 +1,6 @@
 import utils = require('gator-utils');
 import restify = require('restify');
 import client = require('../client');
-import sessions = require('./sessions');
 import accounts = require('./accounts');
 import projects = require('./projects');
 import errors = require('../errors');
@@ -28,11 +27,7 @@ module.exports = function(name: string, password: string, appId: number, callbac
             else if (!result)                       //  then check for a missing result
                 callback(new errors.APIError());
             else {
-                let authObject = result.data;
-
-                //  set the session object for the user - changes to authObject will be reflected
-                sessions.set(authObject);
-                callback(null, authObject);
+                callback(null, result.data);
             }
         });
     } catch (err) {

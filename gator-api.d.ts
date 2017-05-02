@@ -154,13 +154,8 @@ declare module 'gator-api' {
         expiration:Date;
         account:accounts.Account;
         projects:Array<projects.Project>;
+        projectId: number;
         currentProjectId:number;
-    }
-
-    export module sessions {
-        export function set(authObject:any);
-        export function get(accessToken:string);
-        export function remove(accessToken:string);
     }
 
     export module REST {
@@ -199,7 +194,7 @@ declare module 'gator-api' {
     }
 
     export function login(name:string, password:string, appId:number, callback:(err?:errors.APIError, result?:Authorization) => void);
-    export function logout(res:any);
+    export function logout(req:any, res:any);
     export function authorize(params:any, callback:(err?:errors.APIError, result?:Authorization) => void);
     export function log(a1?:any, a2?:any, a3?:any, a4?:any, a5?:any);
 
@@ -211,7 +206,6 @@ declare module 'gator-api' {
     export function reauthenticate(req, res, next);
     export function authenticateNoRedirect(req, res, next);
     export function signup(params:any, callback:(err?:errors.APIError, result?:Authorization) => void);
-    export function setSessionCookie(res:any, accessToken:string);
     export function machineId():string;
     export function isSysAdmin(req): boolean;
     export function hasAdminPermission(req, permission: string): boolean;

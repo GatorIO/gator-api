@@ -24,8 +24,6 @@ export let reporting = _reporting;
 export let logs = require('./admin/logs');
 export let login = require('./admin/login');
 export let signup = require('./admin/signup');
-export let sessions = require('./admin/sessions');
-
 
 export let REST = require('./REST');
 
@@ -35,6 +33,7 @@ export class Authorization {
     expiration: Date;
     account: _accounts.Account;
     projects: Array<_projects.Project>;
+    projectId: number;
     currentProjectId: number;
 }
 
@@ -42,8 +41,10 @@ export function log(a1, a2, a3, a4, a5) {
     logs.log(a1, a2, a3, a4, a5);
 }
 
-/*
- Authorize an access token and return user data.
+/**
+ * Authorize an access token and return user data.
+ * @param params
+ * @param callback
  */
 export function authorize(params: any, callback: (err?: _errors.APIError, result?: Authorization) => void) {
 
@@ -78,12 +79,12 @@ export function authenticate(req, res, next) {
     delete req['reauthenticate'];
 
     //  look for an access token override on the query string or a request to reauthenticate
-    if ((req.query && req.query.accessToken) || (reauthenticate && req.session && req.session.auth)) {
+    if ((req.query && req.query.accessToken) || (reauthenticate && req.session && req.session.accessToken)) {
 
         if (req.query && req.query.accessToken)
             accessToken = req.query.accessToken;
         else
-            accessToken = req.session.auth.accessToken;
+            accessToken = req.session.accessToken;
 
         let authParams = {
             accessToken: accessToken,
@@ -96,7 +97,13 @@ export function authenticate(req, res, next) {
         authorize(authParams, function(err, authObject) {
 
             if (!err && authObject) {
-                req.session.auth = authObject;
+                req.session.accessToken = authObject.accessToken;
+                req.session.user = authObject.user;
+                req.session.expiration = authObject.expiration;
+                req.session.account = authObject.account;
+                req.session.projects = authObject.projects;
+                req.session.projectId = authObject.projectId;
+                req.session.currentProjectId = authObject.currentProjectId;
                 return next();
             } else {
 
@@ -106,7 +113,7 @@ export function authenticate(req, res, next) {
                     return next();
             }
         });
-    } else if (req.session.auth) {
+    } else if (req.session.accessToken) {
         return next();
     } else {
 
@@ -117,32 +124,53 @@ export function authenticate(req, res, next) {
     }
 }
 
+/**
+ * Authenticate a user, but if not valid, do not redirect to the login page.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {any|any}
+ */
 export function authenticateNoRedirect(req, res, next) {
     req['noRedirect'] = true;
     return authenticate(req, res, next);
 }
 
-//  authenticate but not from cache
+/**
+ * Authenticate, but reload the authorization even if it is present.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {any|any}
+ */
 export function reauthenticate(req, res, next) {
     req['reauthenticate'] = true;
     return authenticate(req, res, next);
 }
 
-export function logout(res) {
-    res.clearCookie('accessToken');
+/**
+ * Clear authorization from session and redirect to the login page.
+ * @param res
+ */
+export function logout(req, res) {
+
+    if (req.session) {
+        delete req.session.accessToken;
+        delete req.session.user;
+        delete req.session.expiration;
+        delete req.session.account;
+        delete req.session.projects;
+        delete req.session.projectId;
+        delete req.session.currentProjectId;
+    }
+
     res.redirect('/login');
 }
 
-//  set the session cookie securely for live sessions
-export function setSessionCookie(res, accessToken: string) {
-
-    if (utils.config.dev())
-        res.cookie('accessToken', accessToken, { signed: true });
-    else
-        res.cookie('accessToken', accessToken, { httpOnly: true, secure: true, signed: true });
-}
-
-//  Generates unique machine id.  This is used for signing cookies.
+/**
+ * Generates unique machine id.  This can be used for signing cookies.
+ * @returns {string}
+ */
 export function machineId(): string {
 
     try {
@@ -178,13 +206,18 @@ export function machineId(): string {
     }
 }
 
-//  Return a project object based on an id
+/**
+ * Return a project object based on an id.
+ * @param req
+ * @param id
+ * @returns {any}
+ */
 export function getProject(req, id) {
 
-    if (!req || !req.session || !req.session.auth)
+    if (!req || !req.session || !req.session.accessToken)
         return null;
 
-    let ret, projects = req.session.auth.projects;
+    let ret, projects = req.session.projects;
 
     if (projects && id) {
 
@@ -197,13 +230,17 @@ export function getProject(req, id) {
     return ret || null;
 }
 
-//  Return the current active project's object or NULL if one is not selected
+/**
+ * Return the current active project's object or NULL if one is not selected.
+ * @param req
+ * @returns {any}
+ */
 export function currentProject(req) {
 
-    if (!req || !req.session || !req.session.auth)
+    if (!req || !req.session || !req.session.accessToken)
         return null;
 
-    let ret, projects = req.session.auth.projects, id = req.session.auth.currentProjectId;
+    let ret, projects = req.session.projects, id = req.session.currentProjectId;
 
     if (projects && id) {
 
@@ -213,18 +250,27 @@ export function currentProject(req) {
         });
     }
 
-    if (!ret && req.session.auth.projects && req.session.auth.projects.length > 0)
-        ret = req.session.auth.projects[0];
+    if (!ret && req.session.projects && req.session.projects.length > 0)
+        ret = req.session.projects[0];
     
     return ret || null;
 }
 
-//  Check that an auth has a specific permission for an app - this applies mainly to ops and admin functions
+/**
+ * Check that an auth has a specific permission for an app - this applies mainly to ops and admin functions.
+ * @param req
+ * @returns {boolean}
+ */
 export function isSysAdmin(req): boolean {
     return hasAdminPermission(req, 'admin');
 }
 
-//  Check that an auth has a specific permission for an app - this applies mainly to ops and admin functions
+/**
+ * Check that an auth has a specific permission for an app - this applies mainly to ops and admin functions.
+ * @param req
+ * @param permission
+ * @returns {boolean}
+ */
 export function hasAdminPermission(req, permission: string): boolean {
 
     try {
@@ -232,10 +278,10 @@ export function hasAdminPermission(req, permission: string): boolean {
         //  A permission is granted if:
         //  1)  The user has been assigned admin permission
         //  2)  The user has been assigned the specific permission
-        if (!req || !req.session || !req.session.auth || !req.session.auth.user || !req.session.auth.user.permissions)
+        if (!req || !req.session || !req.session.user || !req.session.user.permissions)
             return false;
 
-        let user = req.session.auth.user;
+        let user = req.session.user;
 
         if (user.appId != 1)
             return false;

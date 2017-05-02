@@ -3,16 +3,15 @@ import users = require('./users');
 import accounts = require('./accounts');
 import errors = require('../errors');
 import api = require('../index');
-import sessions = require('./sessions');
 
-var settings = utils.config.settings();
-var login = require('./login');
+let settings = utils.config.settings();
+let login = require('./login');
 
 module.exports = function(params: any, callback: Function) {
 
     try {
 
-        var user: any = {
+        let user: any = {
             appId: settings.appId,
             name: params['username'],
             password: params['password'],
