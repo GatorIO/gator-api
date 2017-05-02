@@ -63,56 +63,52 @@ export function authorize(params: any, callback: (err?: _errors.APIError, result
     }
 }
 
+/**
+ * If the user is authenticated in the session, call next() to call the next request handler.
+ * If the user is not authenticated, redirect to the login page.
+ * @param req
+ * @param res
+ * @param next
+ * @returns {any}
+ */
 export function authenticate(req, res, next) {
-    // if user is authenticated in the session, call the next() to call the next request handler
-    // The session adds this method to request object. A middleware is allowed to add properties to
-    // request and response objects
+    //
     let accessToken, noRedirect = req['noRedirect'], reauthenticate = req['reauthenticate'];
     delete req['noRedirect'];
     delete req['reauthenticate'];
 
-    //  look for an access token override on the query string
-    if (req.query && req.query.accessToken) {
-        accessToken = req.query.accessToken;
-        setSessionCookie(res, accessToken);
-    } else if (req.signedCookies['accessToken'])
-        accessToken = req.signedCookies['accessToken'];
+    //  look for an access token override on the query string or a request to reauthenticate
+    if ((req.query && req.query.accessToken) || (reauthenticate && req.session && req.session.auth)) {
 
-    if (accessToken) {
+        if (req.query && req.query.accessToken)
+            accessToken = req.query.accessToken;
+        else
+            accessToken = req.session.auth.accessToken;
 
-        req.session = sessions.get(accessToken);
+        let authParams = {
+            accessToken: accessToken,
+            noCache: true
+        };
 
-        //  if the session doesn't exist, try to authorize the token, since the server may have been rebooted
-        if (!req.session || reauthenticate) {
+        if (settings.hasOwnProperty('appId'))
+            authParams['appId'] = +settings.appId;
 
-            let authParams = {
-                accessToken: accessToken,
-                noCache: true
-            };
+        authorize(authParams, function(err, authObject) {
 
-            if (settings.hasOwnProperty('appId'))
-                authParams['appId'] = +settings.appId;
+            if (!err && authObject) {
+                req.session.auth = authObject;
+                return next();
+            } else {
 
-            authorize(authParams, function(err, authObject) {
-
-                if (!err && authObject) {
-                    sessions.set(authObject);
-                    req.session = authObject;
+                if (!noRedirect)
+                    res.redirect('/login');
+                else
                     return next();
-                } else {
-                    req.session = null;
-
-                    if (!noRedirect)
-                        res.redirect('/login');
-                    else
-                        return next();
-                }
-            });
-        } else {
-            return next();
-        }
+            }
+        });
+    } else if (req.session.auth) {
+        return next();
     } else {
-        req.session = null;
 
         if (!noRedirect)
             res.redirect('/login');
@@ -183,12 +179,12 @@ export function machineId(): string {
 }
 
 //  Return a project object based on an id
-export function     getProject(req, id) {
+export function getProject(req, id) {
 
-    if (!req || !req['session'])
+    if (!req || !req.session || !req.session.auth)
         return null;
 
-    let ret, projects = req['session'].projects;
+    let ret, projects = req.session.auth.projects;
 
     if (projects && id) {
 
@@ -204,10 +200,10 @@ export function     getProject(req, id) {
 //  Return the current active project's object or NULL if one is not selected
 export function currentProject(req) {
 
-    if (!req || !req['session'])
+    if (!req || !req.session || !req.session.auth)
         return null;
 
-    let ret, projects = req['session'].projects, id = req['session'].currentProjectId;
+    let ret, projects = req.session.auth.projects, id = req.session.auth.currentProjectId;
 
     if (projects && id) {
 
@@ -217,8 +213,8 @@ export function currentProject(req) {
         });
     }
 
-    if (!ret && req['session'].projects && req['session'].projects.length > 0)
-        ret = req['session'].projects[0];
+    if (!ret && req.session.auth.projects && req.session.auth.projects.length > 0)
+        ret = req.session.auth.projects[0];
     
     return ret || null;
 }
@@ -236,10 +232,10 @@ export function hasAdminPermission(req, permission: string): boolean {
         //  A permission is granted if:
         //  1)  The user has been assigned admin permission
         //  2)  The user has been assigned the specific permission
-        if (!req || !req.session || !req.session.user || !req.session.user.permissions)
+        if (!req || !req.session || !req.session.auth || !req.session.auth.user || !req.session.auth.user.permissions)
             return false;
 
-        let user = req.session.user;
+        let user = req.session.auth.user;
 
         if (user.appId != 1)
             return false;

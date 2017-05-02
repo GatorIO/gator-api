@@ -10,13 +10,13 @@ module.exports = function(name: string, password: string, appId: number, callbac
 
     try {
 
-        var params = {
+        let params = {
             name: name,
             password: password
         };
 
-        //  If the module is specified, it means the login is for a specific module(product).  Specifying the appId will
-        //  check for the existance of an account for the user in that module and pull the user's account object into the authObject.
+        //  If the appId is specified, it means the login is for a specific app(product).  Specifying the appId will
+        //  check for the existance of an account for the user in that app and pull the user's account object into the authObject.
         if (utils.isNumeric(appId)) {
             params['appId'] = appId;
         }
@@ -28,7 +28,7 @@ module.exports = function(name: string, password: string, appId: number, callbac
             else if (!result)                       //  then check for a missing result
                 callback(new errors.APIError());
             else {
-                var authObject = result.data;
+                let authObject = result.data;
 
                 //  set the session object for the user - changes to authObject will be reflected
                 sessions.set(authObject);
