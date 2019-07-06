@@ -1,7 +1,7 @@
 {
   "name": "gator-api",
   "description": "Gator.IO admin api",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "author": {
     "name": "Gator.IO"
   },
@@ -24,9 +24,13 @@
     "@types/node": "^10.14.12",
     "@types/async": "^2.4.2",
     "async": "^2.6.2",
-    "gator-utils": "GatorIO/gator-utils#1.x",
+    "gator-utils": "GatorIO/gator-utils#2.x",
     "@types/restify": "^4.3.2",
-    "restify": "^4.3.4"
+    "restify": "^4.3.4",
+    "typescript": "^3.5.2"
   },
-  "license" : "MIT"
+  "license" : "MIT",
+  "scripts": {
+    "install": "tsc"
+  }
 }
