@@ -1,13 +1,22 @@
-import utils = require("gator-utils");
 import client = require("../client");
-import restify = require('restify');
-import errors = require('../errors');
+import utils = require("gator-utils");
 
+/**
+ * Log an application error to the api host.
+ * @param a1
+ * @param a2
+ * @param a3
+ * @param a4
+ * @param a5
+ */
 export function log(a1, a2?, a3?, a4?, a5?) {
 
-    var errors = {};
+    let errors: any = {};
 
     try {
+
+        if (utils.isNumeric(utils.config.settings()['appId']))
+            errors.appId = utils.config.settings()['appId'];
 
         if (a1) errors['data1'] = a1;
         if (a2) errors['data2'] = a2;

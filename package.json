@@ -14,21 +14,19 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/GatorIO/gator-admin.git"
+    "url": "https://github.com/GatorIO/gator-api.git"
   },
   "engines": {
-    "node": ">=4.2.0"
+    "node": ">=8.7.0"
   },
   "types": "./gator-api.d.ts",
   "dependencies": {
-    "@types/node": "^6.0.68",
-    "@types/async": "^2.0.40",
-    "async": "^2.3.0",
-    "@types/lru-cache": "^2.5.32",
-    "lru-cache": "^4.0.2",
-    "gator-utils": "GatorIO/gator-utils",
-    "@types/restify": "^2.0.42",
-    "restify": "^4.3.0"
+    "@types/node": "^10.14.12",
+    "@types/async": "^2.4.2",
+    "async": "^2.6.2",
+    "gator-utils": "GatorIO/gator-utils#1.x",
+    "@types/restify": "^4.3.2",
+    "restify": "^4.3.4"
   },
   "license" : "MIT"
 }

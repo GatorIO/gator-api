@@ -2,6 +2,8 @@ declare module 'gator-api' {
     import restify = require('restify');
 
     export let client;
+    export function sessionClient(req): restify.Client;
+    export let sessionStore;
 
     export module errors {
 
@@ -132,6 +134,7 @@ declare module 'gator-api' {
 
         export function get(params:any, callback:(err?:errors.APIError, result?:any) => void);
         export function create(params:any, callback:(err?:errors.APIError, result?:any) => void);
+        export function setPartnerId(req: any, partnerId: number, callback: (err?: errors.APIError) => void);
     }
 
     export module projects {
@@ -150,6 +153,7 @@ declare module 'gator-api' {
 
     export class Authorization {
         accessToken:string;
+        adminMode: boolean;
         user:users.User;
         expiration:Date;
         account:accounts.Account;
@@ -162,7 +166,6 @@ declare module 'gator-api' {
         export let client:restify.Client;
         export class ResponseResult {
             constructor(code?:number, data?:Object, message?:string);
-
             code:number;
             message:string;
             data:Object;
@@ -182,11 +185,9 @@ declare module 'gator-api' {
         domain: string;
         appName: string;
         appId: number;
-
         nodeHost: string;
         nodePort: number;
         nodeUrl: string;
-
         apiUrl: string;
         apiVersion: string;
 
@@ -196,10 +197,20 @@ declare module 'gator-api' {
     export function login(name:string, password:string, appId:number, callback:(err?:errors.APIError, result?:Authorization) => void);
     export function logout(req:any, res:any);
     export function authorize(params:any, callback:(err?:errors.APIError, result?:Authorization) => void);
+    export function setSessionAuth(req, auth: Authorization);
+    export function clearSessionAuth(req);
     export function log(a1?:any, a2?:any, a3?:any, a4?:any, a5?:any);
 
     export module logs {
         export function log(a1?:any, a2?:any, a3?:any, a4?:any, a5?:any);
+    }
+
+    export module logger {
+        export function fatal(...items);
+        export function error(...items);
+        export function warn(...items);
+        export function info(...items);
+        export function trace(...items);
     }
 
     export function authenticate(req, res, next);

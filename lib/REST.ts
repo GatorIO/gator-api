@@ -5,9 +5,8 @@ import restify = require("restify");
  Common REST API functions
  */
 
-
 //  The global restify client for the API calls
-export var client: restify.Client = restify.createJsonClient({
+export let client: restify.Client = restify.createJsonClient({
     url: utils.config.settings()['apiUrl'],
     version: '*'
 });
@@ -39,7 +38,7 @@ export class ResponseResult {
 
         try {
 
-            var doc = {};
+            let doc = {};
 
             if (this.code)
                 doc['code'] = this.code;
@@ -57,9 +56,13 @@ export class ResponseResult {
     }
 }
 
-//  Convert an error object into a response.
+/**
+ * Convert an error object into a response.
+ * @param res
+ * @param err
+ */
 export function sendError(res: any, err: any) {
-    var result = new ResponseResult();
+    let result = new ResponseResult();
 
     if (err.code)
         err.code = +err.code;
@@ -86,26 +89,47 @@ export function sendError(res: any, err: any) {
     res.json(result.toJson());
 }
 
+/**
+ * Set headers to prevent a page from caching.
+ * @param res
+ */
 export function noCache(res: any) {
     res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
     res.header('Expires', '-1');
     res.header('Pragma', 'no-cache');
 }
 
+/**
+ * Send a temporary redirect.
+ * @param res
+ * @param location
+ * @param code
+ */
 export function redirect(res: any, location: string, code: number = 302) {
     res.header('Location', location);
     res.send(+code);
 }
 
-//  Send a successful response to client.
+/**
+ * Send a successful response to client.
+ * @param res
+ * @param data
+ * @param message
+ */
 export function send(res: any, data?: Object, message?: string) {
     noCache(res);
 
-    var response = new ResponseResult(200, data, message);
+    let response = new ResponseResult(200, data, message);
     res.json(response.toJson());
 }
 
-//  If an error is present, send the error, else send the object and message
+/**
+ * If an error is present, send the error, else send the object and message.
+ * @param res
+ * @param err
+ * @param data
+ * @param message
+ */
 export function sendConditional(res: any, err: any, data?: Object, message?: string) {
 
     if (err)
@@ -114,7 +138,11 @@ export function sendConditional(res: any, err: any, data?: Object, message?: str
         res.json(new ResponseResult(200, data, message).toJson());
 }
 
-//  Check that a secure connection is used
+/**
+ * Check that a secure connection is used.
+ * @param req
+ * @returns {boolean}
+ */
 export function isSecure(req): boolean {
 
     if (utils.config.dev() || req.secure) {

@@ -3,9 +3,10 @@ import restify = require("restify");
 
 //  The global restify client for the API calls
 
-var client: restify.Client = restify.createJsonClient({
+let client: restify.Client = restify.createJsonClient({
     url: utils.config.settings()['apiUrl'],
-    version: '*'
+    version: '*',
+    requestTimeout: 60000 * 5
 });
 
 export = client;

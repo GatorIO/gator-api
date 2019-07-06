@@ -45,7 +45,7 @@ export function create(params: any, callback: (err?: errors.APIError, result?: a
 export function authorize(accessToken: string, callback: (err?: errors.APIError, result?: any) => void) {
     try{
 
-        var params = { "accessToken": accessToken };
+        let params = { "accessToken": accessToken };
 
         client.post('/v1/authorize', params, function(err, req: restify.Request, res: restify.Response, result: any) {
 
