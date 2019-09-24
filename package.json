@@ -27,7 +27,7 @@
     "gator-utils": "GatorIO/gator-utils#2.x",
     "@types/restify": "^4.3.2",
     "restify": "^4.3.4",
-    "typescript": "^3.6.2"
+    "typescript": "^3.6.3"
   },
   "license" : "MIT",
   "scripts": {
