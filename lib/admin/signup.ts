@@ -19,7 +19,8 @@ module.exports = function(params: any, callback: Function) {
             status: 0,
             timezone: params['timezoneId'],
             accountData: params['accountData'],
-            accountType: params['accountType']
+            accountType: params['accountType'],
+            isSignup: true
         };
 
         if (params['partnerId'])
