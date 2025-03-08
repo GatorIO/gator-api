@@ -2,13 +2,14 @@ import utils = require('gator-utils');
 import client = require('../client');
 import errors = require('../errors');
 
-module.exports = function(name: string, password: string, appId: number, callback: Function) {
+module.exports = function(name: string, password: string, appId: number, remoteAddress: string, callback: Function) {
 
     try {
 
         let params = {
             name: name,
-            password: password
+            password: password,
+            remoteAddress
         };
 
         //  If the appId is specified, it means the login is for a specific app(product).  Specifying the appId will
