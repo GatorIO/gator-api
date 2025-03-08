@@ -194,7 +194,7 @@ declare module 'gator-api' {
         product: string;
     }
 
-    export function login(name:string, password:string, appId:number, callback:(err?:errors.APIError, result?:Authorization) => void);
+    export function login(name:string, password:string, appId:number, remoteAddres: string, callback:(err?:errors.APIError, result?:Authorization) => void);
     export function logout(req:any, res:any);
     export function authorize(params:any, callback:(err?:errors.APIError, result?:Authorization) => void);
     export function setSessionAuth(req, auth: Authorization);
