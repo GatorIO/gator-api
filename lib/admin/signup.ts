@@ -20,7 +20,7 @@ module.exports = function(params: any, callback: Function) {
             timezone: params['timezoneId'],
             accountData: params['accountData'],
             accountType: params['accountType'],
-            isSignup: true
+            remoteAddress: params['remoteAddress']
         };
 
         if (params['partnerId'])
