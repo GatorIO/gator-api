@@ -34,7 +34,7 @@ module.exports = function(params: any, callback: Function) {
             }
 
             //  log in to get access token
-            login(user.name, user.password, settings.appId, function(err, authorization) {
+            login(user.name, user.password, settings.appId, null, function(err, authorization) {
                 callback(err, authorization);
             });
         });
