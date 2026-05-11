@@ -1,5 +1,5 @@
 import utils = require("gator-utils");
-import restify = require('restify');
+import http = require('./http');
 import _client = require('./client');
 import _sessionStore = require('./admin/sessionStore');
 import _errors = require('./errors');
@@ -13,7 +13,7 @@ import _REST = require('./REST');
 
 let settings = utils.config.settings();
 
-export let client: restify.Client = _client;
+export let client: http.HttpClient = _client;
 export let sessionStore = _sessionStore;
 export let errors = _errors;
 export let users = _users;
@@ -53,14 +53,14 @@ export function log(a1, a2, a3, a4, a5) {
 }
 
 /**
- * For requests from a web session, return a restify JSON client with the authorization of the session added.
+ * For requests from a web session, return a JSON client with the authorization of the session added.
  * @param req
- * @returns {Client}
+ * @returns {HttpClient}
  */
-export function sessionClient(req): restify.Client {
-    let clientParams: any = {
-        url: utils.config.settings()['apiUrl'],
-        version: '*'
+export function sessionClient(req): http.HttpClient {
+
+    const clientParams: http.ClientOptions = {
+        url: utils.config.settings()['apiUrl']
     };
 
     //  For authenticated sessions, add the access token to the header.  This uses the bearer token method as described in https://tools.ietf.org/html/rfc6750.
@@ -71,30 +71,21 @@ export function sessionClient(req): restify.Client {
         };
     }
 
-    return restify.createJsonClient(clientParams);
+    return http.createJsonClient(clientParams);
 }
 
 /**
  * Authorize an access token and return user data.
  * @param params
- * @param callback
  */
-export function authorize(params: any, callback: (err?: _errors.APIError, result?: Authorization) => void) {
+export async function authorize(params: any): Promise<Authorization> {
 
-    try {
+    const result = await client.post('/v1/authorize', params);
 
-        client.post('/v1/authorize', params, function(err, req: restify.Request, res: restify.Response, result: any) {
+    if (!result)
+        throw new errors.APIError();
 
-            if (err)                                //  first, check for an exception
-                callback(err);
-            else if (!result)                       //  then check for a missing result
-                callback(new errors.APIError());
-            else
-                callback(null, result.data);        //  finally, return the payload
-        });
-    } catch(err) {
-        callback(err);
-    }
+    return result.data;
 }
 
 /**
@@ -137,7 +128,7 @@ export function clearSessionAuth(req) {
  * @returns {any}
  */
 export function authenticate(req, res, next) {
-    //
+
     let accessToken, noRedirect = req['noRedirect'], reauthenticate = req['reauthenticate'];
     delete req['noRedirect'];
     delete req['reauthenticate'];
@@ -150,7 +141,7 @@ export function authenticate(req, res, next) {
         else
             accessToken = req.session.accessToken;
 
-        let authParams = {
+        let authParams: any = {
             accessToken: accessToken,
             noCache: true
         };
@@ -158,19 +149,28 @@ export function authenticate(req, res, next) {
         if (settings.hasOwnProperty('appId'))
             authParams['appId'] = +settings.appId;
 
-        authorize(authParams, function(err, authObject) {
+        (async () => {
 
-            if (!err && authObject) {
-                setSessionAuth(req, authObject);
-                return next();
-            } else {
+            try {
+                const authObject = await authorize(authParams);
+
+                if (authObject) {
+                    setSessionAuth(req, authObject);
+                    return next();
+                }
+
+                if (!noRedirect)
+                    res.redirect('/login');
+                else
+                    return next();
+            } catch (err) {
 
                 if (!noRedirect)
                     res.redirect('/login');
                 else
                     return next();
             }
-        });
+        })();
     } else if (req.session.accessToken) {
         return next();
     } else {

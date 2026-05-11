@@ -1,14 +1,13 @@
 import utils = require("gator-utils");
-import restify = require("restify");
+import http = require("./http");
 
 /*
  Common REST API functions
  */
 
-//  The global restify client for the API calls
-export let client: restify.Client = restify.createJsonClient({
-    url: utils.config.settings()['apiUrl'],
-    version: '*'
+//  The global JSON client for the API calls
+export let client: http.HttpClient = http.createJsonClient({
+    url: utils.config.settings()['apiUrl']
 });
 
 export class ResponseResult {

@@ -1,44 +1,33 @@
 import utils = require('gator-utils');
 import users = require('./users');
+import login = require('./login');
 
 let settings = utils.config.settings();
-let login = require('./login');
 
-module.exports = function(params: any, callback: Function) {
+async function signup(params: any): Promise<any> {
 
-    try {
+    const user: any = {
+        appId: settings.appId,
+        name: params['username'],
+        password: params['password'],
+        firstName: params['firstName'],
+        lastName: params['lastName'],
+        email: params['email'],
+        couponId: params['couponId'],
+        status: 0,
+        timezone: params['timezoneId'],
+        accountData: params['accountData'],
+        accountType: params['accountType'],
+        remoteAddress: params['remoteAddress']
+    };
 
-        let user: any = {
-            appId: settings.appId,
-            name: params['username'],
-            password: params['password'],
-            firstName: params['firstName'],
-            lastName: params['lastName'],
-            email: params['email'],
-            couponId: params['couponId'],
-            status: 0,
-            timezone: params['timezoneId'],
-            accountData: params['accountData'],
-            accountType: params['accountType'],
-            remoteAddress: params['remoteAddress']
-        };
+    if (params['partnerId'])
+        user.partnerId = params['partnerId'];
 
-        if (params['partnerId'])
-            user.partnerId = params['partnerId'];
-        
-        users.create(user, function(err, newuser){
+    await users.create(user);
 
-            if (err) {
-                callback(err);
-                return;
-            }
+    //  log in to get access token
+    return await login(user.name, user.password, settings.appId, null);
+}
 
-            //  log in to get access token
-            login(user.name, user.password, settings.appId, null, function(err, authorization) {
-                callback(err, authorization);
-            });
-        });
-    } catch (err) {
-        callback(err);
-    }
-};
+export = signup;

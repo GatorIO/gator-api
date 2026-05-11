@@ -1,11 +1,10 @@
 import utils = require("gator-utils");
-import restify = require('restify');
+import http = require("../http");
 let util = require('util');
 
-//  use a REST client
-let client: restify.Client = restify.createJsonClient({
-    url: utils.config.settings()['apiUrl'],
-    version: '*'
+//  use a JSON client
+let client: http.HttpClient = http.createJsonClient({
+    url: utils.config.settings()['apiUrl']
 });
 
 /**
@@ -26,69 +25,65 @@ module.exports = function(connect) {
 
     APIStore.prototype.get = function(sid, callback) {
 
-        try {
+        (async () => {
 
-            client.get('/v1/sessions/' + sid, function (err, req, res, result) {
-                try {
-                    if (err)
-                        return callback(err, null);
+            try {
+                const result = await client.get('/v1/sessions/' + sid);
 
-                    if (!result.data)
-                        return callback();
+                if (!result.data)
+                    return callback();
 
-                    return callback(null, result.data.data);
-                } catch (err) {
-                    return callback(err);
-                }
-            });
-        } catch(err) {
-            return callback(err);
-        }
+                return callback(null, result.data.data);
+            } catch (err) {
+                return callback(err);
+            }
+        })();
     };
 
     APIStore.prototype.destroy = function(sid, callback) {
-        try {
 
-            client.del('/v1/sessions/' + sid, function (err, req, res) {
+        (async () => {
+
+            try {
+                await client.del('/v1/sessions/' + sid);
+                return callback();
+            } catch (err) {
                 return callback(err);
-            });
-        } catch(err) {
-            return callback(err);
-        }
+            }
+        })();
     };
 
     APIStore.prototype.set = function(sid, data, callback) {
 
-        try {
-            let lastAccess = new Date();
-            let expires: Date = new Date(lastAccess.setDate(lastAccess.getDate() + 1));
+        (async () => {
 
-            if (typeof data.cookie != 'undefined')
-                expires = new Date(data.cookie._expires);
+            try {
+                let lastAccess = new Date();
+                let expires: Date = new Date(lastAccess.setDate(lastAccess.getDate() + 1));
 
-            if (typeof data.lastAccess != 'undefined')
-                lastAccess = new Date(data.lastAccess);
+                if (typeof data.cookie != 'undefined')
+                    expires = new Date(data.cookie._expires);
 
-            let update = {
-                data: data,
-                lastAccess: lastAccess,
-                expires: expires,
-                appId: utils.config.settings().appId
-            };
+                if (typeof data.lastAccess != 'undefined')
+                    lastAccess = new Date(data.lastAccess);
 
-            client.put('/v1/sessions/' + sid, update, function (err, req, res) {
-                try {
-                    if (err)
-                        return callback(err, null);
+                let update = {
+                    data: data,
+                    lastAccess: lastAccess,
+                    expires: expires,
+                    appId: utils.config.settings().appId
+                };
 
+                await client.put('/v1/sessions/' + sid, update);
+
+                if (callback)
                     return callback();
-                } catch (err) {
+            } catch (err) {
+                if (callback)
                     return callback(err);
-                }
-            });
-        } catch (err) {
-            callback && callback(err);
-        }
+            }
+        })();
     };
+
     return APIStore;
 };

@@ -9,31 +9,25 @@ import utils = require("gator-utils");
  * @param a4
  * @param a5
  */
-export function log(a1, a2?, a3?, a4?, a5?) {
+export async function log(a1, a2?, a3?, a4?, a5?): Promise<void> {
 
-    let errors: any = {};
+    let entry: any = {};
 
     try {
 
         if (utils.isNumeric(utils.config.settings()['appId']))
-            errors.appId = utils.config.settings()['appId'];
+            entry.appId = utils.config.settings()['appId'];
 
-        if (a1) errors['data1'] = a1;
-        if (a2) errors['data2'] = a2;
-        if (a3) errors['data3'] = a3;
-        if (a4) errors['data4'] = a4;
-        if (a5) errors['data5'] = a5;
+        if (a1) entry['data1'] = a1;
+        if (a2) entry['data2'] = a2;
+        if (a3) entry['data3'] = a3;
+        if (a4) entry['data4'] = a4;
+        if (a5) entry['data5'] = a5;
 
-        client.post('/v1/ops/logs', errors, function(err, req, res) {
-
-            if (err) {
-                console.log('logger after client.post', err);
-                console.dir(errors);
-            }
-        });
-    } catch(err) {
-        //  nothing to do here except log to console
-        console.log(err);
-        console.dir(errors);
+        await client.post('/v1/ops/logs', entry);
+    } catch (err) {
+        //  fire-and-forget — log to console on failure
+        console.log('logger after client.post', err);
+        console.dir(entry);
     }
 }

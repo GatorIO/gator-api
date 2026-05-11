@@ -14,7 +14,10 @@ export enum Levels {
  * @param {Levels} level
  * @param items
  */
-export function createEntry(level: Levels, items) {
+export async function createEntry(level: Levels, items): Promise<void> {
+
+    let params: any;
+
     try {
 
         // normalize objects
@@ -42,7 +45,7 @@ export function createEntry(level: Levels, items) {
             }
         }
 
-        let params: any = {
+        params = {
             level: level,
             data: items
         };
@@ -50,15 +53,11 @@ export function createEntry(level: Levels, items) {
         if (utils.isNumeric(utils.config.settings()['appId']))
             params.appId = utils.config.settings()['appId'];
 
-        client.post('/v1/ops/logs', params, function(err, req, res) {
-
-            if (err) {
-                console.log('logger after client.post', err);
-                console.dir(params);
-            }
-        });
-    } catch(err) {
-        console.dir(err);
+        await client.post('/v1/ops/logs', params);
+    } catch (err) {
+        console.log('logger after client.post', err);
+        if (params)
+            console.dir(params);
     }
 }
 

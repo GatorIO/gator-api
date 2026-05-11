@@ -1,6 +1,5 @@
 import utils = require("gator-utils");
 import REST = require("./REST");
-import errors = require("./errors");
 import index = require("./index");
 import applications = require("./admin/applications");
 import logger = require("./admin/logs");
@@ -20,57 +19,45 @@ export interface IEntities {
 export let entities: { [name: string] : any } = {};
 export let dictionaries: { [name: string] : any } = {};
 
-export function init(callback: Function) {
+export async function init(): Promise<void> {
+
+    let apps: Array<applications.Application>;
 
     try {
+        apps = await applications.getAll();
+    } catch (err: any) {
+        console.log('Error in reporting.init: ' + err.message);
+        logger.log('Error in reporting.init: ', err);
+        throw err;
+    }
 
-        applications.getAll(function(err, apps: Array<applications.Application>) {
+    const app = apps[settings.appId];
 
-            if (err) {
-                console.log('Error in reporting.init: ' + err.message);
-                logger.log('Error in reporting.init: ', err);
-                callback(err);
-                return;
-            }
+    if (!app.reporting)
+        return;        //  no reporting for app, so just return
 
-            let app = apps[settings.appId];
+    //  standardize endpoints with / at end
+    if (app.reporting.apiEndpoint.substr(app.reporting.apiEndpoint.length - 1, 1) != '/') {
+        app.reporting.apiEndpoint += '/';
+    }
 
-            if (!app.reporting) {
-                callback();        //  no reporting for app, so just callback
-            } else {
+    try {
+        const entResult = await REST.client.get(app.reporting.apiEndpoint + 'entities');
+        entities = entResult.data;
+    } catch (err: any) {
+        logger.log('Error in getting entitites for ' + app.name, err);
+        console.log('Error in getting entitites for ' + app.name + ': ' + err.message);
+        throw err;
+    }
 
-                //  standardize endpoints with / at end
-                if (app.reporting.apiEndpoint.substr(app.reporting.apiEndpoint.length - 1, 1) != '/') {
-                    app.reporting.apiEndpoint += '/';
-                }
-
-                REST.client.get(app.reporting.apiEndpoint + 'entities', function (err: errors.APIError, apiRequest, apiResponse, result: any) {
-
-                    if (err) {
-                        logger.log('Error in getting entitites for ' + app.name, err);
-                        console.log('Error in getting entitites for ' + app.name + ': ' + err.message);
-                        callback(err);
-                    } else {
-                        entities = result.data;
-
-                        REST.client.get(app.reporting.apiEndpoint + 'dictionaries', function (err: errors.APIError, apiRequest, apiResponse, result: any) {
-
-                            if (err) {
-                                logger.log('Error in getting dictionaries for ' + app.name, err);
-                                console.log('Error in getting dictionaries for ' + app.name + ': ' + err.message);
-                                callback(err);
-                            } else {
-                                dictionaries = result.data;
-                                console.log('Reporting.init successful for ' + app.name);
-                                callback();
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    } catch (err) {
-        callback(err);
+    try {
+        const dictResult = await REST.client.get(app.reporting.apiEndpoint + 'dictionaries');
+        dictionaries = dictResult.data;
+        console.log('Reporting.init successful for ' + app.name);
+    } catch (err: any) {
+        logger.log('Error in getting dictionaries for ' + app.name, err);
+        console.log('Error in getting dictionaries for ' + app.name + ': ' + err.message);
+        throw err;
     }
 }
 
@@ -415,33 +402,22 @@ export function getSegmentOptions(req) {
     return options;
 }
 
-export function getSegments(req, useCache: boolean, appId: number, callback: (err: errors.APIError, segments?: Array<Segment>) => void) {
+export async function getSegments(req, useCache: boolean, appId: number): Promise<Array<Segment>> {
+
+    //  if the segments for the account have already been looked up, just return them
+    if (useCache && req.session['segments'])
+        return req.session['segments'];
+
+    const apps = await applications.getAll();
+    const endpoint = apps[settings.appId].reporting.apiEndpoint;
 
     try {
-
-        //  if the segments for the account have already been looked up, just return them
-        if (useCache && req.session['segments']) {
-            callback(null, req.session['segments']);
-            return;
-        }
-
-        applications.getAll(function(err, apps) {
-
-            let endpoint = apps[settings.appId].reporting.apiEndpoint;
-
-            REST.client.get(endpoint + 'segments?accessToken=' + req.session.accessToken, function(err: errors.APIError, apiRequest, apiResponse, result: any) {
-
-                if (!err) {
-                    req.session['segments'] = result.data;
-                } else {
-                    logger.log(err);
-                    req.session['segments'] = [];
-                }
-
-                callback(err, result.data);
-            });
-        });
-    } catch(err) {
-        callback(err);
+        const result = await REST.client.get(endpoint + 'segments?accessToken=' + req.session.accessToken);
+        req.session['segments'] = result.data;
+        return result.data;
+    } catch (err) {
+        logger.log(err);
+        req.session['segments'] = [];
+        throw err;
     }
 }

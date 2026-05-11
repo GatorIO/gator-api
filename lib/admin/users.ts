@@ -1,6 +1,5 @@
 import client = require('../client');
 import errors = require('../errors');
-import restify = require('restify');
 
 export enum UserStatus {
     /**
@@ -25,40 +24,23 @@ export class User {
     public ipAddress: string;
 }
 
-export function create(params: any, callback: (err?: errors.APIError, result?: any) => void) {
-    try{
+export async function create(params: any): Promise<any> {
 
-        client.post('/v1/users', params, function(err, req: restify.Request, res: restify.Response, result: any) {
+    const result = await client.post('/v1/users', params);
 
-            if (err)                                //  first, check for an exception
-                callback(err);
-            else if (!result)                       //  then check for a missing result
-                callback(new errors.APIError());
-            else
-                callback(null, result.data.user);        //  finally, return the payload
-        });
-    } catch(err) {
-        callback(err);
-    }
+    if (!result)
+        throw new errors.APIError();
+
+    return result.data.user;
 }
 
-export function authorize(accessToken: string, callback: (err?: errors.APIError, result?: any) => void) {
-    try{
+export async function authorize(accessToken: string): Promise<any> {
 
-        let params = { "accessToken": accessToken };
+    const params = { "accessToken": accessToken };
+    const result = await client.post('/v1/authorize', params);
 
-        client.post('/v1/authorize', params, function(err, req: restify.Request, res: restify.Response, result: any) {
+    if (!result)
+        throw new errors.APIError();
 
-            if (err)                                //  first, check for an exception
-                callback(err);
-            else if (!result)                       //  then check for a missing result
-                callback(new errors.APIError());
-            else
-                callback(null, result.data);        //  finally, return the payload
-        });
-    } catch(err) {
-        callback(err);
-    }
+    return result.data;
 }
-
-
