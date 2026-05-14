@@ -21,7 +21,7 @@
   },
   "types": "./lib/index.d.ts",
   "dependencies": {
-    "gator-utils": "GatorIO/gator-utils#ed40aea3bdbb795213e936cf48dfd9840b7be72c"
+    "gator-utils": "GatorIO/gator-utils"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
