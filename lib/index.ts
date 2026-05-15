@@ -146,7 +146,7 @@ export function authenticate(req, res, next) {
             noCache: true
         };
 
-        if (settings.hasOwnProperty('appId'))
+        if (Object.hasOwn(settings, 'appId'))
             authParams['appId'] = +settings.appId;
 
         (async () => {
@@ -237,7 +237,7 @@ export function machineId(): string {
 
         for (let iface in nis) {
 
-            if (nis.hasOwnProperty(iface)) {
+            if (Object.hasOwn(nis, iface)) {
 
                 if (utils.isArray(nis[iface])) {
 

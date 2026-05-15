@@ -208,7 +208,7 @@ export function addAttributeView(options, entityName: string, attributeType: Att
 
     for (let name in customAttribs[entityName]) {
 
-        if (customAttribs[entityName].hasOwnProperty(name)) {
+        if (Object.hasOwn(customAttribs[entityName], name)) {
 
             let attrib = customAttribs[entityName][name];
 
@@ -262,7 +262,7 @@ export function addFilterView(filterOptions, entityName: string, customAttribs: 
 
     for (let name in customAttribs[entityName]) {
 
-        if (customAttribs[entityName].hasOwnProperty(name) && customAttribs[entityName][name].filterable) {
+        if (Object.hasOwn(customAttribs[entityName], name) && customAttribs[entityName][name].filterable) {
 
             let attrib = customAttribs[entityName][name];
             attrib.title = entityName + ': ' + name;
