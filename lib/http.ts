@@ -16,6 +16,7 @@ export interface HttpClient {
     get(path: string, headers?: Record<string, string>): Promise<ResponseBody>;
     post(path: string, body?: any, headers?: Record<string, string>): Promise<ResponseBody>;
     put(path: string, body?: any, headers?: Record<string, string>): Promise<ResponseBody>;
+    patch(path: string, body?: any, headers?: Record<string, string>): Promise<ResponseBody>;
     del(path: string, headers?: Record<string, string>): Promise<ResponseBody>;
 }
 
@@ -93,6 +94,7 @@ export function createJsonClient(options: ClientOptions): HttpClient {
         get: (path, headers) => request('GET', path, undefined, headers),
         post: (path, body, headers) => request('POST', path, body, headers),
         put: (path, body, headers) => request('PUT', path, body, headers),
+        patch: (path, body, headers) => request('PATCH', path, body, headers),
         del: (path, headers) => request('DELETE', path, undefined, headers),
     };
 }
